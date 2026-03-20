@@ -7,12 +7,27 @@ Tech stack: Vite, React 19, TypeScript.
 ---
 
 ## Workflow
-
 - Always run tests before committing (`npm run test` when tests exist)
 - Always run `npm run build` to verify no TypeScript errors before committing
 - Build on top of existing features — never remove or replace functionality unless explicitly told to
 - **Always ask permission before pushing anything to GitHub**
 - When a mistake is corrected mid-session, add the lesson as a rule here
+
+---
+
+## Test-Driven Development (TDD)
+
+This project follows strict TDD. For every new feature:
+
+1. **Write the test first** — before any implementation code
+2. **Verify the test fails** — confirms the test is actually testing something
+3. **Implement the feature** — write only enough code to make the test pass
+4. **Verify the test passes** — run `npm run test` and confirm green
+5. **Commit** — only after tests are passing
+
+- Never write implementation code without a corresponding test written first
+- Tests live alongside their source file: `Foo.tsx` → `Foo.test.tsx`
+- Tests should describe expected behavior, not implementation details
 
 ---
 
