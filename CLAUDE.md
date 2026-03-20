@@ -13,6 +13,17 @@ Tech stack: Vite, React 19, TypeScript, Tailwind CSS v4.
 - **Always ask permission before pushing anything to GitHub**
 - When a mistake is corrected mid-session, add the lesson as a rule here
 
+### Commit frequency
+- Commit after every discrete, working unit of work — do not batch multiple features into one commit
+- Each of the following always gets its own commit:
+  - New file or module created
+  - Tests written (commit the failing tests before implementing)
+  - Feature implemented and tests passing
+  - Config or dependency change
+  - Bug fix
+- If more than ~3 files changed for unrelated reasons, split into multiple commits
+- Commit message format: `scope: short description` (e.g. `backend: add health endpoint`, `frontend: backend status indicator`, `test: health endpoint TDD`)
+
 ---
 
 ## Test-Driven Development (TDD)
