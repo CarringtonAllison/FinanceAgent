@@ -2,7 +2,7 @@
 
 ## Project Context
 React + TypeScript application built on an AI agent architecture.
-Tech stack: Vite, React 19, TypeScript.
+Tech stack: Vite, React 19, TypeScript, Tailwind CSS v4.
 
 ---
 
@@ -33,6 +33,7 @@ This project follows strict TDD. For every new feature:
 
 ## Code Style
 
+- Use Tailwind CSS for all styling — no new CSS files or inline styles
 - Named exports only — no default exports
 - No `any` in TypeScript — cast or type properly
 - Components stay under 150 lines — split if larger
