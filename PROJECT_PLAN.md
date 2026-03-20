@@ -10,17 +10,20 @@ time with full P&L tracking — realistic day trading with zero risk.
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React + Tailwind CSS + Recharts |
-| Backend | Python + FastAPI |
-| Agents | Python classes (single responsibility) |
-| Real-time data | Alpaca Markets API (paper trading) |
-| News data | NewsAPI (free tier) or Polygon.io |
-| AI | Anthropic Claude API — Sentiment + Recommendation agents ONLY |
-| Paper trading | Alpaca paper trading account (built-in fake money) |
-| Storage | SQLite |
-| Output | JSON file written server-side, downloadable from UI |
+| Layer | Technology | Status |
+|---|---|---|
+| Frontend | React + Tailwind CSS v4 + lightweight-charts | ✅ In use |
+| Backend | Python 3.14 + FastAPI | ✅ In use |
+| Agents | Python classes (single responsibility) | 🔄 Partial |
+| Real-time data | Alpaca Markets API (paper trading) | ✅ In use |
+| News data | NewsAPI (free tier) or Polygon.io | ⏳ Phase 3 |
+| AI | Anthropic Claude API — Sentiment + Recommendation only | ⏳ Phase 3 |
+| Paper trading | Alpaca paper trading account | ⏳ Phase 4 |
+| Storage | SQLite | ✅ In use |
+| Output | JSON file written server-side, downloadable from UI | ⏳ Phase 3 |
+
+> **Note:** `lightweight-charts` (TradingView) used instead of Recharts — native candlestick support.
+> `ta` library used instead of `pandas-ta` — `pandas-ta` depends on `numba` which doesn't support Python 3.14.
 
 ---
 
@@ -28,28 +31,27 @@ time with full P&L tracking — realistic day trading with zero risk.
 
 **Rule: Maximum 2 Claude API calls per analysis run to minimize costs.**
 
-### 1. Orchestrator Agent _(pure code — no Claude call)_
+### 1. Orchestrator Agent _(pure code — no Claude call)_ ⏳ Phase 3
 - Coordinates all agents
 - Merges all agent outputs
 - Writes final JSON recommendation file
 
-### 2. Market Data Agent _(pure code — no Claude call)_
+### 2. Market Data Agent _(pure code — no Claude call)_ ✅ Complete
 - Calls Alpaca API for real-time price, OHLC, volume
-- Streams data via WebSocket
+- Streams data via Alpaca WebSocket → SSE to frontend
 - Uses free IEX data from Alpaca paper account
 
-### 3. Technical Analysis Agent _(pure code — no Claude call)_
+### 3. Technical Analysis Agent _(pure code — no Claude call)_ ✅ Complete
 - Calculates RSI, MACD, EMA crossovers (9/21), Bollinger Bands
-- Uses `pandas-ta` library
-- Identifies buy/sell signals based on indicator thresholds
+- Uses `ta` library (Python 3.14 compatible)
 - Returns structured signal data
 
-### 4. Sentiment Agent _(uses Claude API — 1 call per analysis)_
+### 4. Sentiment Agent _(uses Claude API — 1 call per analysis)_ ⏳ Phase 3
 - Fetches 5-10 recent news headlines for the ticker
 - Sends all headlines to Claude in a single batch call
 - Returns: bullish / neutral / bearish + reasoning
 
-### 5. Recommendation Agent _(uses Claude API — 1 call per analysis)_
+### 5. Recommendation Agent _(uses Claude API — 1 call per analysis)_ ⏳ Phase 3
 - Receives merged output from all other agents
 - Generates final BUY / SELL / HOLD recommendation
 - Returns confidence score (0–1) and plain-English reasoning
@@ -58,13 +60,13 @@ time with full P&L tracking — realistic day trading with zero risk.
 
 ## Paper Trading Account
 - Alpaca built-in paper trading environment
-- Starting balance: $10,000 (configurable)
+- Starting balance: $1,000 (configurable)
 - Tracks open positions, average cost, unrealized P&L
 - Full trade history stored in SQLite
 
 ---
 
-## Environment Variables (`.env`)
+## Environment Variables (`backend/.env`)
 ```
 ALPACA_API_KEY=
 ALPACA_SECRET_KEY=
@@ -114,50 +116,63 @@ NEWS_API_KEY=
 
 ## Dashboard UI Sections
 
-1. **Portfolio Bar** — starting cash, total value, total P&L, daily P&L
-2. **Ticker Search** — symbol input + Analyze button
-3. **Agent Progress Tracker** — live status per agent via SSE (Pending → Running → Complete)
-4. **Price Chart** — real-time candlestick chart + RSI and MACD panels (Recharts)
-5. **Sentiment Card** — score + headline summaries
-6. **Recommendation Card** — BUY/SELL/HOLD + confidence % + Claude's reasoning
-7. **Trade Panel** — share quantity input, estimated cost, Buy/Sell buttons, balance validation
-8. **Positions Table** — ticker, shares, avg cost, current price, unrealized P&L
-9. **Trade History Log** — date, ticker, action, shares, price, total
-10. **Download Report Button** — downloads latest JSON analysis file for current ticker
+| # | Section | Status |
+|---|---|---|
+| 1 | **Portfolio Bar** — cash, total value, P&L | ⏳ Phase 4 |
+| 2 | **Ticker Search** — symbol input + Analyze button | ✅ Complete |
+| 3 | **Agent Progress Tracker** — live SSE status per agent | ⏳ Phase 3 |
+| 4 | **Price Chart** — real-time candlestick + RSI/MACD panels | ✅ Complete |
+| 5 | **Sentiment Card** — score + headlines | ⏳ Phase 3 |
+| 6 | **Recommendation Card** — BUY/SELL/HOLD + reasoning | ⏳ Phase 3 |
+| 7 | **Trade Panel** — shares input, cost estimate, Buy/Sell | ⏳ Phase 4 |
+| 8 | **Positions Table** — open positions + unrealized P&L | ⏳ Phase 4 |
+| 9 | **Trade History Log** — full trade log | ⏳ Phase 4 |
+| 10 | **Download Report Button** — JSON analysis file | ⏳ Phase 3 |
 
 ---
 
 ## Phased Build Plan
 
-### Phase 1 — Foundation
-- Set up FastAPI backend folder structure
-- Connect to Alpaca API with paper trading credentials
-- Set up SQLite schema (portfolio, positions, trades)
-- Health check endpoint
-- Verify React frontend connects to backend
-- Install all dependencies (frontend + backend)
+### ✅ Phase 1 — Foundation
+- FastAPI backend folder structure (`/backend`)
+- SQLite schema: `portfolio`, `positions`, `trades` tables
+- `/health` endpoint
+- React frontend connects to backend with live status indicator
+- Vitest + React Testing Library set up
+- pytest + pytest-asyncio set up
+- **Tests: 13 frontend, 9 backend — all green**
 
-### Phase 2 — Market Data + Technical Analysis
-- Market Data Agent: real-time price feed via Alpaca WebSocket
-- Candlestick chart in React with Recharts
-- Technical Analysis Agent: RSI, MACD, EMA with `pandas-ta`
+### ✅ Phase 2 — Market Data + Technical Analysis
+- Market Data Agent: Alpaca REST (bars, snapshot) + WebSocket stream → SSE
+- Endpoints: `/market-data/{ticker}/bars`, `/snapshot`, `/stream`
+- Technical Analysis Agent: RSI, MACD, EMA (9/21), Bollinger Bands via `ta`
+- Endpoint: `/analysis/{ticker}`
+- `TickerSearch` component — uppercase input, Analyze button
+- `PriceChart` component — lightweight-charts candlestick, real-time SSE updates
+- **Tests: 13 frontend, 27 backend — all green**
+- **Notable decisions:** `lightweight-charts` over Recharts, `ta` over `pandas-ta`
 
-### Phase 3 — AI Agents
-- Sentiment Agent: news fetch + single Claude API call
+### ⏳ Phase 3 — AI Agents _(next up)_
+- Sentiment Agent: fetch news headlines + single Claude API call
 - Recommendation Agent: merged data + single Claude API call
-- Orchestrator: wire all agents, write JSON output
-- SSE endpoint for live agent progress streaming to UI
+- Orchestrator Agent: wire all agents, write JSON output file
+- SSE endpoint for live agent progress (Pending → Running → Complete)
+- Sentiment Card UI component
+- Recommendation Card UI component
+- Agent Progress Tracker UI component
+- Download Report button
 
-### Phase 4 — Paper Trading
+### ⏳ Phase 4 — Paper Trading
 - Buy/sell order execution via Alpaca paper API
-- Portfolio tracking and P&L calculations
-- Positions table and trade history UI
+- Portfolio bar: cash, total value, daily P&L
+- Trade Panel UI component
+- Positions Table UI component
+- Trade History Log UI component
 
-### Phase 5 — Polish
+### ⏳ Phase 5 — Polish
 - Agent progress UI animations
-- JSON report download button
 - Responsive design cleanup
-- Error handling and loading states
+- Error handling and loading states throughout
 
 ---
 
@@ -165,5 +180,22 @@ NEWS_API_KEY=
 - Max 2 Claude API calls per analysis run
 - Free APIs only — no paid data subscriptions
 - Single ticker at a time now, architected for multiple later
-- All keys in `.env` — never hardcoded
+- All keys in `backend/.env` — never hardcoded
 - SQLite only — no external database
+
+---
+
+## Running Locally
+
+```bash
+# Backend
+cd backend
+uvicorn backend.main:app --reload
+
+# Frontend (separate terminal)
+npm run dev
+
+# Tests
+python -m pytest backend/tests/ -v
+npm test
+```
