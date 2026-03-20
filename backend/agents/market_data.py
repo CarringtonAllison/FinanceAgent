@@ -1,0 +1,90 @@
+import os
+from collections.abc import AsyncGenerator
+
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.live import StockDataStream
+from alpaca.data.requests import StockBarsRequest, StockSnapshotRequest
+from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+class MarketDataAgent:
+    def __init__(self, api_key: str | None = None, secret_key: str | None = None) -> None:
+        self._api_key = api_key or os.getenv("ALPACA_API_KEY", "")
+        self._secret_key = secret_key or os.getenv("ALPACA_SECRET_KEY", "")
+        self._client = StockHistoricalDataClient(self._api_key, self._secret_key)
+
+    def get_bars(
+        self,
+        ticker: str,
+        timeframe: str = "1Min",
+        limit: int = 100,
+    ) -> list[dict]:
+        tf = self._parse_timeframe(timeframe)
+        request = StockBarsRequest(symbol_or_symbols=ticker, timeframe=tf, limit=limit)
+        response = self._client.get_stock_bars(request)
+        bars = response[ticker]
+        return [
+            {
+                "time": int(bar.timestamp.timestamp()),
+                "open": float(bar.open),
+                "high": float(bar.high),
+                "low": float(bar.low),
+                "close": float(bar.close),
+                "volume": float(bar.volume),
+            }
+            for bar in bars
+        ]
+
+    def get_snapshot(self, ticker: str) -> dict:
+        request = StockSnapshotRequest(symbol_or_symbols=ticker)
+        response = self._client.get_stock_snapshot(request)
+        snap = response[ticker]
+        return {
+            "ticker": ticker,
+            "price": float(snap.latest_trade.price),
+            "volume": float(snap.daily_bar.volume),
+        }
+
+    async def stream_bars(self, ticker: str) -> AsyncGenerator[dict, None]:
+        queue: list[dict] = []
+
+        def on_bar(bar: object) -> None:
+            import alpaca.data.models as models
+            if isinstance(bar, models.Bar):
+                queue.append(
+                    {
+                        "time": int(bar.timestamp.timestamp()),
+                        "open": float(bar.open),
+                        "high": float(bar.high),
+                        "low": float(bar.low),
+                        "close": float(bar.close),
+                    }
+                )
+
+        stream = StockDataStream(self._api_key, self._secret_key)
+        stream.subscribe_bars(on_bar, ticker)
+
+        import asyncio
+        stream_task = asyncio.create_task(stream.run())
+        try:
+            while True:
+                if queue:
+                    yield queue.pop(0)
+                else:
+                    await asyncio.sleep(0.5)
+        finally:
+            stream_task.cancel()
+
+    @staticmethod
+    def _parse_timeframe(timeframe: str) -> TimeFrame:
+        mapping: dict[str, TimeFrame] = {
+            "1Min": TimeFrame(1, TimeFrameUnit.Minute),
+            "5Min": TimeFrame(5, TimeFrameUnit.Minute),
+            "15Min": TimeFrame(15, TimeFrameUnit.Minute),
+            "1Hour": TimeFrame(1, TimeFrameUnit.Hour),
+            "1Day": TimeFrame(1, TimeFrameUnit.Day),
+        }
+        return mapping.get(timeframe, TimeFrame(1, TimeFrameUnit.Minute))
