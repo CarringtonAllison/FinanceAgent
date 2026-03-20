@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.database import init_db, seed_portfolio
 from backend.routers.health import router as health_router
+from backend.routers.market_data import router as market_data_router
 
 
 @asynccontextmanager
@@ -25,3 +26,4 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+app.include_router(market_data_router)
