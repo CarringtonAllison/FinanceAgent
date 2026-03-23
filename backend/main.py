@@ -9,6 +9,7 @@ from backend.routers.health import router as health_router
 from backend.routers.market_data import router as market_data_router
 from backend.routers.analysis import router as analysis_router
 from backend.routers.orchestrate import router as orchestrate_router
+from backend.routers.portfolio import router as portfolio_router
 
 
 @asynccontextmanager
@@ -31,3 +32,4 @@ app.include_router(health_router)
 app.include_router(market_data_router)
 app.include_router(analysis_router)
 app.include_router(orchestrate_router)
+app.include_router(portfolio_router)
