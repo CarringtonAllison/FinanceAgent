@@ -18,8 +18,13 @@ function pnlColor(pnl: number): string {
 export function PortfolioBar({ cashBalance, totalValue, totalUnrealizedPnl, loading }: PortfolioBarProps) {
   if (loading) {
     return (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 px-6 py-3">
-        <span className="text-sm text-slate-500 animate-pulse">Loading portfolio…</span>
+      <div data-testid="portfolio-skeleton" className="flex items-center gap-8 rounded-lg border border-slate-700 bg-slate-800 px-6 py-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex flex-col gap-1">
+            <div className="h-3 w-16 animate-pulse rounded bg-slate-700" />
+            <div className="h-4 w-24 animate-pulse rounded bg-slate-700" />
+          </div>
+        ))}
       </div>
     )
   }
