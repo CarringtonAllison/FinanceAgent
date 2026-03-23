@@ -69,6 +69,13 @@ describe('TradePanel', () => {
     await waitFor(() => expect(onTradeExecuted).toHaveBeenCalled())
   })
 
+  it('updates ticker input when ticker prop changes', async () => {
+    const { rerender } = render(<TradePanel ticker="AAPL" onTradeExecuted={vi.fn()} />)
+    expect(screen.getByDisplayValue('AAPL')).toBeInTheDocument()
+    rerender(<TradePanel ticker="TSLA" onTradeExecuted={vi.fn()} />)
+    expect(screen.getByDisplayValue('TSLA')).toBeInTheDocument()
+  })
+
   it('shows error message on 400 response', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
