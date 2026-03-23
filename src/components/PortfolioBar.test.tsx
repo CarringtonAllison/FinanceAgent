@@ -31,8 +31,8 @@ describe('PortfolioBar', () => {
     expect(pnl.className).toMatch(/slate/)
   })
 
-  it('shows loading skeleton when loading is true', () => {
-    render(<PortfolioBar cashBalance={0} totalValue={0} totalUnrealizedPnl={0} loading={true} />)
-    expect(screen.getByText(/loading/i)).toBeInTheDocument()
+  it('renders skeleton shimmer when loading is true', () => {
+    const { container } = render(<PortfolioBar cashBalance={0} totalValue={0} totalUnrealizedPnl={0} loading={true} />)
+    expect(container.querySelector('[data-testid="portfolio-skeleton"]')).toBeInTheDocument()
   })
 })
