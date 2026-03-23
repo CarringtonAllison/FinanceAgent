@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AgentProgressTracker } from './components/AgentProgressTracker'
+import { ErrorBanner } from './components/ErrorBanner'
 import type { AgentState } from './components/AgentProgressTracker'
 import { PortfolioBar } from './components/PortfolioBar'
 import { PositionsTable } from './components/PositionsTable'
@@ -59,6 +60,7 @@ export function App() {
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null)
   const [trades, setTrades] = useState<Trade[]>([])
   const [portfolioLoading, setPortfolioLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
 
   const fetchPortfolio = useCallback(async () => {
@@ -113,6 +115,7 @@ export function App() {
       setStreamUrl(`http://localhost:8000/market-data/${symbol}/stream`)
     } catch {
       setLoading(false)
+      setErrorMessage('Could not reach the backend. Is it running?')
       return
     }
 
@@ -150,6 +153,7 @@ export function App() {
     es.onerror = () => {
       es.close()
       setLoading(false)
+      setErrorMessage('Analysis stream failed. Please try again.')
     }
   }
 
@@ -179,6 +183,12 @@ export function App() {
           {label}
         </span>
       </div>
+
+      {errorMessage && (
+        <div className="w-full max-w-4xl">
+          <ErrorBanner message={errorMessage} onDismiss={() => setErrorMessage(null)} />
+        </div>
+      )}
 
       <div className="w-full max-w-4xl">
         <PortfolioBar
