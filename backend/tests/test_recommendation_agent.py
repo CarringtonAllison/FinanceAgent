@@ -20,7 +20,8 @@ def agent() -> RecommendationAgent:
 
 
 def test_analyze_returns_required_keys(agent: RecommendationAgent) -> None:
-    with patch("backend.agents.recommendation.anthropic.Anthropic") as MockClaude:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}), \
+         patch("backend.agents.recommendation.anthropic.Anthropic") as MockClaude:
         MockClaude.return_value.messages.create.return_value = MagicMock(
             content=[MagicMock(text='{"action":"BUY","confidence":0.81,"reasoning":"Strong signals."}')]
         )
@@ -29,7 +30,8 @@ def test_analyze_returns_required_keys(agent: RecommendationAgent) -> None:
 
 
 def test_analyze_returns_valid_action(agent: RecommendationAgent) -> None:
-    with patch("backend.agents.recommendation.anthropic.Anthropic") as MockClaude:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}), \
+         patch("backend.agents.recommendation.anthropic.Anthropic") as MockClaude:
         MockClaude.return_value.messages.create.return_value = MagicMock(
             content=[MagicMock(text='{"action":"BUY","confidence":0.81,"reasoning":"Strong signals."}')]
         )
@@ -38,7 +40,8 @@ def test_analyze_returns_valid_action(agent: RecommendationAgent) -> None:
 
 
 def test_analyze_returns_confidence_float(agent: RecommendationAgent) -> None:
-    with patch("backend.agents.recommendation.anthropic.Anthropic") as MockClaude:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}), \
+         patch("backend.agents.recommendation.anthropic.Anthropic") as MockClaude:
         MockClaude.return_value.messages.create.return_value = MagicMock(
             content=[MagicMock(text='{"action":"HOLD","confidence":0.55,"reasoning":"Mixed signals."}')]
         )

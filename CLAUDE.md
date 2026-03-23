@@ -57,6 +57,4 @@ This project follows strict TDD. For every new feature:
 
 _Rules added from corrections during development. Added as they occur._
 
-<!-- example format:
-- Do not X — reason discovered on [date]
--->
+- When testing agents that check `os.getenv()`, use `patch.dict("os.environ", {"KEY": "test-value"})` rather than patching `os.getenv` directly — discovered 2026-03-23
