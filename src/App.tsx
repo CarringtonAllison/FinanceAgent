@@ -201,14 +201,12 @@ export function App() {
 
       <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
 
-      {!ticker && (
-        <p className="text-slate-600 text-sm mt-4">Enter a ticker symbol above to begin analysis.</p>
-      )}
+      <div className="w-full max-w-4xl">
+        <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
+      </div>
 
       {ticker && (
         <div className="w-full max-w-4xl flex flex-col gap-6">
-          <PriceChart bars={bars} ticker={ticker} streamUrl={streamUrl} />
-
           {Object.keys(agentProgress).length > 0 && (
             <AgentProgressTracker agents={agentProgress} />
           )}

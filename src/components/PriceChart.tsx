@@ -20,11 +20,22 @@ interface Bar {
 
 interface PriceChartProps {
   bars: Bar[]
-  ticker: string
+  ticker: string | null
   streamUrl: string | null
 }
 
 export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
+  if (!ticker) {
+    return (
+      <div
+        data-testid="price-chart-placeholder"
+        className="flex h-[320px] w-full items-center justify-center rounded-xl border border-slate-800 bg-gray-900"
+      >
+        <p className="text-sm text-slate-500">Enter a ticker symbol to view the chart.</p>
+      </div>
+    )
+  }
+
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
