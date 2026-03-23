@@ -7,7 +7,6 @@ interface TradePanelProps {
 
 export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
   const [inputTicker, setInputTicker] = useState(ticker)
-  const [action, setAction] = useState<'BUY' | 'SELL'>('BUY')
   const [shares, setShares] = useState<number>(1)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -15,7 +14,6 @@ export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
   async function handleSubmit(selectedAction: 'BUY' | 'SELL') {
     setError(null)
     setSubmitting(true)
-    setAction(selectedAction)
     try {
       const res = await fetch('http://localhost:8000/portfolio/trade', {
         method: 'POST',

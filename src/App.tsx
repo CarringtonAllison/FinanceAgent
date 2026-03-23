@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AgentProgressTracker } from './components/AgentProgressTracker'
 import type { AgentState } from './components/AgentProgressTracker'
+import { PortfolioBar } from './components/PortfolioBar'
+import { PositionsTable } from './components/PositionsTable'
+import type { Position } from './components/PositionsTable'
 import { PriceChart } from './components/PriceChart'
 import { RecommendationCard } from './components/RecommendationCard'
 import type { RecommendationResult } from './components/RecommendationCard'
 import { SentimentCard } from './components/SentimentCard'
 import type { SentimentResult } from './components/SentimentCard'
 import { TickerSearch } from './components/TickerSearch'
+import { TradeHistoryLog } from './components/TradeHistoryLog'
+import type { Trade } from './components/TradeHistoryLog'
+import { TradePanel } from './components/TradePanel'
 
 type BackendStatus = 'connecting' | 'connected' | 'offline'
 
@@ -17,6 +23,21 @@ interface Bar {
   low: number
   close: number
   volume: number
+}
+
+interface PortfolioData {
+  cash_balance: number
+  total_value: number
+  positions: Array<{
+    ticker: string
+    shares: number
+    avg_cost: number
+    current_price: number
+    market_value: number
+    unrealized_pnl: number
+    unrealized_pnl_pct: number
+  }>
+  total_unrealized_pnl: number
 }
 
 const AGENT_ORDER = ['market_data', 'technical_analysis', 'sentiment', 'recommendation']
@@ -35,19 +56,46 @@ export function App() {
   const [sentiment, setSentiment] = useState<SentimentResult | null>(null)
   const [recommendation, setRecommendation] = useState<RecommendationResult | null>(null)
   const [reportFilename, setReportFilename] = useState<string | null>(null)
+  const [portfolio, setPortfolio] = useState<PortfolioData | null>(null)
+  const [trades, setTrades] = useState<Trade[]>([])
+  const [portfolioLoading, setPortfolioLoading] = useState(false)
   const eventSourceRef = useRef<EventSource | null>(null)
+
+  const fetchPortfolio = useCallback(async () => {
+    setPortfolioLoading(true)
+    try {
+      const [portfolioRes, tradesRes] = await Promise.all([
+        fetch('http://localhost:8000/portfolio'),
+        fetch('http://localhost:8000/portfolio/trades'),
+      ])
+      const portfolioData = await portfolioRes.json() as PortfolioData
+      const tradesData = await tradesRes.json() as { trades: Array<{ id: number; ticker: string; action: string; shares: number; price: number; total: number; created_at: string }> }
+      setPortfolio(portfolioData)
+      setTrades(tradesData.trades.map((t) => ({
+        id: t.id,
+        ticker: t.ticker,
+        action: t.action as Trade['action'],
+        shares: t.shares,
+        price: t.price,
+        total: t.total,
+        createdAt: t.created_at,
+      })))
+    } finally {
+      setPortfolioLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     fetch('http://localhost:8000/health')
       .then((res) => res.json())
       .then((data: { status: string }) => {
         setBackendStatus(data.status === 'ok' ? 'connected' : 'offline')
+        if (data.status === 'ok') fetchPortfolio()
       })
       .catch(() => setBackendStatus('offline'))
-  }, [])
+  }, [fetchPortfolio])
 
   async function handleAnalyze(symbol: string) {
-    // Close any previous SSE connection
     eventSourceRef.current?.close()
 
     setLoading(true)
@@ -68,7 +116,6 @@ export function App() {
       return
     }
 
-    // Open SSE stream for agent orchestration
     const es = new EventSource(`http://localhost:8000/orchestrate/${symbol}/run`)
     eventSourceRef.current = es
 
@@ -114,6 +161,16 @@ export function App() {
 
   const { label, classes } = statusConfig[backendStatus]
 
+  const mappedPositions: Position[] = (portfolio?.positions ?? []).map((p) => ({
+    ticker: p.ticker,
+    shares: p.shares,
+    avgCost: p.avg_cost,
+    currentPrice: p.current_price,
+    marketValue: p.market_value,
+    unrealizedPnl: p.unrealized_pnl,
+    unrealizedPnlPct: p.unrealized_pnl_pct,
+  }))
+
   return (
     <div className="min-h-screen flex flex-col items-center gap-8 p-8">
       <div className="flex items-center justify-between w-full max-w-4xl">
@@ -121,6 +178,15 @@ export function App() {
         <span className={`text-xs font-semibold tracking-widest border px-3 py-1 rounded-full ${classes}`}>
           {label}
         </span>
+      </div>
+
+      <div className="w-full max-w-4xl">
+        <PortfolioBar
+          cashBalance={portfolio?.cash_balance ?? 0}
+          totalValue={portfolio?.total_value ?? 0}
+          totalUnrealizedPnl={portfolio?.total_unrealized_pnl ?? 0}
+          loading={portfolioLoading}
+        />
       </div>
 
       <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
@@ -142,6 +208,8 @@ export function App() {
             <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
           </div>
 
+          <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
+
           {reportFilename && (
             <a
               href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
@@ -153,6 +221,11 @@ export function App() {
           )}
         </div>
       )}
+
+      <div className="w-full max-w-4xl flex flex-col gap-4">
+        <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
+        <TradeHistoryLog trades={trades} loading={portfolioLoading} />
+      </div>
     </div>
   )
 }
