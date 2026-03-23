@@ -62,13 +62,13 @@ def test_buy_deducts_cash(session: Session, agent: PortfolioAgent) -> None:
 
 def test_buy_updates_avg_cost_on_second_buy(session: Session, agent: PortfolioAgent) -> None:
     with patch_price(100.0):
-        agent.execute_trade(session, "AAPL", "BUY", 4.0)
+        agent.execute_trade(session, "AAPL", "BUY", 2.0)
     with patch_price(200.0):
-        agent.execute_trade(session, "AAPL", "BUY", 4.0)
+        agent.execute_trade(session, "AAPL", "BUY", 2.0)
     position = session.query(Position).filter_by(ticker="AAPL").first()
-    # weighted avg: (100*4 + 200*4) / 8 = 150
+    # weighted avg: (100*2 + 200*2) / 4 = 150
     assert position.avg_cost == pytest.approx(150.0)
-    assert position.shares == 8.0
+    assert position.shares == 4.0
 
 
 def test_buy_raises_on_insufficient_cash(session: Session, agent: PortfolioAgent) -> None:
