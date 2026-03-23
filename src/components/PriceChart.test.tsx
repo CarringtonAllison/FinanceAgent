@@ -33,4 +33,9 @@ describe('PriceChart', () => {
     render(<PriceChart bars={[]} ticker="AAPL" streamUrl={null} />)
     expect(screen.getByTestId('price-chart')).toBeInTheDocument()
   })
+
+  it('renders placeholder when ticker is null', () => {
+    render(<PriceChart bars={[]} ticker={null} streamUrl={null} />)
+    expect(screen.getByTestId('price-chart-placeholder')).toBeInTheDocument()
+  })
 })
