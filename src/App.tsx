@@ -176,8 +176,8 @@ export function App() {
   }))
 
   return (
-    <div className="min-h-screen flex flex-col items-center gap-8 p-8">
-      <div className="flex items-center justify-between w-full max-w-4xl">
+    <div className="min-h-screen flex flex-col items-center gap-8 p-4 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-2 w-full max-w-4xl">
         <h1 className="text-2xl font-bold tracking-tight text-slate-100">Finance Agent</h1>
         <span className={`text-xs font-semibold tracking-widest border px-3 py-1 rounded-full ${classes}`}>
           {label}

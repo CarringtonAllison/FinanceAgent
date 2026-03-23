@@ -30,7 +30,7 @@ export function PortfolioBar({ cashBalance, totalValue, totalUnrealizedPnl, load
   }
 
   return (
-    <div className="flex items-center gap-8 rounded-lg border border-slate-700 bg-slate-800 px-6 py-3">
+    <div className="flex flex-wrap items-center gap-4 sm:gap-8 rounded-lg border border-slate-700 bg-slate-800 px-4 sm:px-6 py-3">
       <div className="flex flex-col">
         <span className="text-xs text-slate-500">Cash</span>
         <span className="text-sm font-semibold text-slate-100">{fmt(cashBalance)}</span>
