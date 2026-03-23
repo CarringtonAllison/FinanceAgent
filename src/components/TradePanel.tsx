@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface TradePanelProps {
   ticker: string
@@ -8,6 +8,10 @@ interface TradePanelProps {
 export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
   const [inputTicker, setInputTicker] = useState(ticker)
   const [shares, setShares] = useState<number>(1)
+
+  useEffect(() => {
+    setInputTicker(ticker)
+  }, [ticker])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
