@@ -38,7 +38,7 @@ export function AgentProgressTracker({ agents }: AgentProgressTrackerProps) {
             {AGENT_LABELS[name] ?? name}
           </span>
           <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[state.status]}`}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold transition-all duration-300 ${STATUS_STYLES[state.status]}`}
           >
             {state.status}
           </span>
