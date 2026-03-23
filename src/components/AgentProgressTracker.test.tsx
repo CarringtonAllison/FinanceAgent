@@ -47,4 +47,10 @@ describe('AgentProgressTracker', () => {
     const { container } = render(<AgentProgressTracker agents={{}} />)
     expect(container.firstChild).toBeEmptyDOMElement()
   })
+
+  it('status badge includes transition class', () => {
+    render(<AgentProgressTracker agents={makeAgents()} />)
+    const badges = screen.getAllByText(/pending/i)
+    expect(badges[0].className).toMatch(/transition/)
+  })
 })
