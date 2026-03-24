@@ -82,16 +82,17 @@ async def test_name_search_is_case_insensitive() -> None:
 @pytest.mark.asyncio
 async def test_symbol_matches_ranked_before_name_matches() -> None:
     assets = [
-        {"symbol": "MSFT", "name": "Microsoft Corporation"},
-        {"symbol": "APLE", "name": "Apple Hospitality REIT"},
-        {"symbol": "AAPL", "name": "Apple Inc."},
+        {"symbol": "XGOO", "name": "Some Goo-Related Fund"},  # name match only
+        {"symbol": "GOOG", "name": "Alphabet Inc. Class C"},  # symbol prefix match
+        {"symbol": "GOOGL", "name": "Alphabet Inc. Class A"},  # symbol prefix match
     ]
     with patch("backend.routers.assets._load_assets", return_value=assets):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            response = await client.get("/assets/search?q=AAPL")
+            response = await client.get("/assets/search?q=GOO")
     symbols = [d["symbol"] for d in response.json()]
-    # AAPL is a symbol prefix match — must come before APLE (name contains "Apple")
-    assert symbols.index("AAPL") < symbols.index("APLE")
+    # Symbol prefix matches (GOOG, GOOGL) must appear before name-only match (XGOO)
+    assert symbols.index("GOOG") < symbols.index("XGOO")
+    assert symbols.index("GOOGL") < symbols.index("XGOO")
 
 
 @pytest.mark.asyncio

@@ -37,7 +37,24 @@ def search_assets(q: str = "") -> list[dict]:
     if not q.strip():
         return []
     query = q.strip().upper()
+    query_lower = query.lower()
     assets = _load_assets()
-    matches = [a for a in assets if a["symbol"].startswith(query)]
-    matches.sort(key=lambda a: (len(a["symbol"]), a["symbol"]))
-    return matches[:8]
+
+    seen: set[str] = set()
+
+    # Symbol prefix matches first — sorted by length then alpha
+    symbol_matches = [a for a in assets if a["symbol"].startswith(query)]
+    symbol_matches.sort(key=lambda a: (len(a["symbol"]), a["symbol"]))
+
+    results: list[dict] = []
+    for a in symbol_matches:
+        seen.add(a["symbol"])
+        results.append(a)
+
+    # Name substring matches second — skip any already in results
+    for a in assets:
+        if a["symbol"] not in seen and query_lower in a["name"].lower():
+            results.append(a)
+            seen.add(a["symbol"])
+
+    return results[:8]
