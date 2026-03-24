@@ -18,15 +18,15 @@ function fmt(value: number): string {
 }
 
 function pnlColor(pnl: number): string {
-  if (pnl > 0) return 'text-green-600'
-  if (pnl < 0) return 'text-red-600'
+  if (pnl > 0) return 'text-green-400'
+  if (pnl < 0) return 'text-red-400'
   return 'text-slate-500'
 }
 
 export function PositionsTable({ positions, loading }: PositionsTableProps) {
   if (loading) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
         <p className="text-sm text-slate-500 animate-pulse">Loading positions…</p>
       </div>
     )
@@ -34,40 +34,46 @@ export function PositionsTable({ positions, loading }: PositionsTableProps) {
 
   if (positions.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
         <p className="text-sm text-slate-500">No open positions.</p>
       </div>
     )
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-      <table className="w-full text-sm">
-        <thead className="border-b border-slate-200 bg-slate-50">
-          <tr>
-            {['Ticker', 'Shares', 'Avg Cost', 'Current Price', 'Market Value', 'Unrealized P&L', 'P&L %'].map((h) => (
-              <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-slate-600">{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {positions.map((pos) => (
-            <tr key={pos.ticker} className="border-b border-slate-100 last:border-0">
-              <td className="px-4 py-2 font-semibold text-slate-800">{pos.ticker}</td>
-              <td className="px-4 py-2 text-slate-600">{pos.shares}</td>
-              <td className="px-4 py-2 text-slate-600">{fmt(pos.avgCost)}</td>
-              <td className="px-4 py-2 text-slate-600">{fmt(pos.currentPrice)}</td>
-              <td className="px-4 py-2 text-slate-600">{fmt(pos.marketValue)}</td>
-              <td data-testid={`pnl-${pos.ticker}`} className={`px-4 py-2 font-medium ${pnlColor(pos.unrealizedPnl)}`}>
-                {pos.unrealizedPnl >= 0 ? '+' : ''}{fmt(pos.unrealizedPnl)}
-              </td>
-              <td className={`px-4 py-2 font-medium ${pnlColor(pos.unrealizedPnlPct)}`}>
+    <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
+      {/* Column headers — each label appears once */}
+      <div className="grid grid-cols-3 px-4 py-2 border-b border-slate-700 bg-slate-800/80">
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Ticker</span>
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Shares</span>
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-right">Avg Cost</span>
+      </div>
+
+      {positions.map((pos) => (
+        <div key={pos.ticker} className="px-4 py-3 border-b border-slate-700/50 last:border-0">
+          {/* Row 1: ticker + shares + avg cost */}
+          <div className="grid grid-cols-3 mb-2">
+            <span className="font-bold text-slate-100">{pos.ticker}</span>
+            <span className="text-sm text-slate-400 text-center">{pos.shares}</span>
+            <span className="text-xs text-slate-500 text-right">{fmt(pos.avgCost)}</span>
+          </div>
+          {/* Row 2: P&L + current price + P&L% */}
+          <div className="flex items-center justify-between">
+            <span
+              data-testid={`pnl-${pos.ticker}`}
+              className={`text-sm font-semibold ${pnlColor(pos.unrealizedPnl)}`}
+            >
+              {pos.unrealizedPnl >= 0 ? '+' : ''}{fmt(pos.unrealizedPnl)}
+            </span>
+            <div className="flex flex-col items-end">
+              <span className="text-xs text-slate-400">{fmt(pos.currentPrice)}</span>
+              <span className={`text-xs font-medium ${pnlColor(pos.unrealizedPnlPct)}`}>
                 {pos.unrealizedPnlPct >= 0 ? '+' : ''}{pos.unrealizedPnlPct.toFixed(2)}%
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

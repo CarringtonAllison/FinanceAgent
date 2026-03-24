@@ -14,18 +14,25 @@ interface TradeHistoryLogProps {
 }
 
 const ACTION_STYLES: Record<Trade['action'], string> = {
-  BUY: 'bg-green-100 text-green-700',
-  SELL: 'bg-red-100 text-red-700',
+  BUY:  'bg-green-400/15 text-green-400',
+  SELL: 'bg-red-400/15 text-red-400',
 }
 
 function fmt(value: number): string {
   return value.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })
 }
 
+function fmtDate(iso: string): string {
+  return new Date(iso).toLocaleString('en-US', {
+    month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit',
+  })
+}
+
 export function TradeHistoryLog({ trades, loading }: TradeHistoryLogProps) {
   if (loading) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
         <p className="text-sm text-slate-500 animate-pulse">Loading trade history…</p>
       </div>
     )
@@ -33,32 +40,36 @@ export function TradeHistoryLog({ trades, loading }: TradeHistoryLogProps) {
 
   if (trades.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
         <p className="text-sm text-slate-500">No trades yet.</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-4 max-h-64 overflow-y-auto">
-      <h3 className="font-semibold text-slate-800 text-sm">Trade History</h3>
-      {trades.map((trade) => (
-        <div key={trade.id} className="flex items-center justify-between border-b border-slate-100 pb-2 last:border-0 last:pb-0">
-          <div className="flex items-center gap-3">
-            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${ACTION_STYLES[trade.action]}`}>
-              {trade.action}
-            </span>
-            <span className="text-sm font-semibold text-slate-800">{trade.ticker}</span>
-            <span className="text-xs text-slate-500">{trade.shares} @ {fmt(trade.price)}</span>
+    <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
+      <div className="px-4 py-2 border-b border-slate-700">
+        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Trade History</h3>
+      </div>
+      <div className="max-h-64 overflow-y-auto">
+        {trades.map((trade) => (
+          <div key={trade.id} className="px-4 py-3 border-b border-slate-700/50 last:border-0">
+            {/* Row 1: badge + ticker + total */}
+            <div className="flex items-center gap-2">
+              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold shrink-0 ${ACTION_STYLES[trade.action]}`}>
+                {trade.action}
+              </span>
+              <span className="text-sm font-semibold text-slate-100 flex-1">{trade.ticker}</span>
+              <span className="text-sm font-medium text-slate-300">{fmt(trade.total)}</span>
+            </div>
+            {/* Row 2: shares@price + date */}
+            <div className="flex items-center justify-between mt-1 pl-9">
+              <span className="text-xs text-slate-500">{trade.shares} @ {fmt(trade.price)}</span>
+              <span className="text-xs text-slate-600">{fmtDate(trade.createdAt)}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-slate-700">{fmt(trade.total)}</span>
-            <span className="text-xs text-slate-400">
-              {new Date(trade.createdAt).toLocaleString()}
-            </span>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }
