@@ -185,7 +185,7 @@ export function App() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-20">
+      <header className="border-b border-[#1AAA89]/30 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-20">
         <div className="flex items-center gap-3 px-6 py-4">
           <svg className="w-6 h-6 text-[#1AAA89] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
@@ -208,9 +208,9 @@ export function App() {
 
           {/* Left pane — wallet & portfolio */}
           <div className="w-full xl:w-64 shrink-0 flex flex-col gap-3">
-            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
-              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Wallet</span>
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden">
+              <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
+                <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Wallet</span>
               </div>
               <div className="p-3">
                 <PortfolioBar
@@ -222,9 +222,9 @@ export function App() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden flex-1">
-              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Holdings</span>
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden flex-1">
+              <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
+                <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Holdings</span>
               </div>
               <div className="p-3">
                 <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
@@ -235,12 +235,12 @@ export function App() {
           {/* Middle pane — search & chart */}
           <div className="flex-1 flex flex-col gap-4 min-w-0">
             {/* Search + agent progress — unified card */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden">
               <div className="p-4">
                 <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
               </div>
               {ticker && Object.keys(agentProgress).length > 0 && (
-                <div className="border-t border-slate-800 px-2">
+                <div className="border-t border-[#1AAA89]/20 px-2">
                   <AgentProgressTracker agents={agentProgress} />
                 </div>
               )}
@@ -252,9 +252,9 @@ export function App() {
 
           {/* Right pane — execute trade & history */}
           <div className="w-full xl:w-72 shrink-0 flex flex-col gap-3">
-            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
-              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Execute Trade</span>
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden">
+              <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
+                <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Execute Trade</span>
               </div>
               <div className="p-4">
                 <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
@@ -265,15 +265,15 @@ export function App() {
               <a
                 href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
                 download={reportFilename}
-                className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-400 hover:bg-slate-800 transition-colors text-center"
+                className="rounded-lg border border-[#1AAA89]/30 px-4 py-2 text-sm text-[#6EC5A2] hover:bg-[#1AAA89]/10 transition-colors text-center"
               >
                 Download Report ({reportFilename})
               </a>
             )}
 
-            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden flex-1">
-              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Trade History</span>
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden flex-1">
+              <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
+                <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Trade History</span>
               </div>
               <div className="p-3">
                 <TradeHistoryLog trades={trades} loading={portfolioLoading} />
@@ -285,11 +285,11 @@ export function App() {
 
         {/* AI Analysis — full width below all panes */}
         {ticker && (
-          <div className="rounded-xl border border-slate-800 overflow-hidden">
-            <div className="px-5 py-2.5 bg-slate-800/50 border-b border-slate-800">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">AI Analysis</span>
+          <div className="rounded-xl border border-[#1AAA89]/25 overflow-hidden">
+            <div className="px-5 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
+              <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">AI Analysis</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1AAA89]/20">
               <div className="p-5">
                 <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
               </div>

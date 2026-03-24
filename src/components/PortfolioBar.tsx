@@ -32,15 +32,15 @@ export function PortfolioBar({ cashBalance, totalValue, totalUnrealizedPnl, load
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col">
-        <span className="text-xs text-slate-500">Cash</span>
+        <span className="text-xs text-[#6EC5A2]/70">Cash</span>
         <span className="text-sm font-semibold text-slate-100">{fmt(cashBalance)}</span>
       </div>
       <div className="flex flex-col">
-        <span className="text-xs text-slate-500">Total Value</span>
+        <span className="text-xs text-[#6EC5A2]/70">Total Value</span>
         <span className="text-sm font-semibold text-slate-100">{fmt(totalValue)}</span>
       </div>
       <div className="flex flex-col">
-        <span className="text-xs text-slate-500">Unrealized P&amp;L</span>
+        <span className="text-xs text-[#6EC5A2]/70">Unrealized P&amp;L</span>
         <span data-testid="pnl" className={`text-sm font-semibold ${pnlColor(totalUnrealizedPnl)}`}>
           {totalUnrealizedPnl >= 0 ? '+' : ''}{fmt(totalUnrealizedPnl)}
         </span>

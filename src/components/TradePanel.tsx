@@ -39,23 +39,23 @@ export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-400">Ticker</label>
+          <label className="text-xs text-[#6EC5A2]/70">Ticker</label>
           <input
             type="text"
             value={inputTicker}
             onChange={(e) => setInputTicker(e.target.value.toUpperCase())}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-blue-500 font-mono tracking-widest"
+            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-[#1AAA89] font-mono tracking-widest"
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-400">Shares</label>
+          <label className="text-xs text-[#6EC5A2]/70">Shares</label>
           <input
             type="number"
             min={0.01}
             step={0.01}
             value={shares}
             onChange={(e) => setShares(parseFloat(e.target.value) || 0)}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-blue-500"
+            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-[#1AAA89]"
           />
         </div>
       </div>
