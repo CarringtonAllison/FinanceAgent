@@ -31,29 +31,18 @@ function fmtDate(iso: string): string {
 
 export function TradeHistoryLog({ trades, loading }: TradeHistoryLogProps) {
   if (loading) {
-    return (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <p className="text-sm text-slate-500 animate-pulse">Loading trade history…</p>
-      </div>
-    )
+    return <p className="text-sm text-slate-500 animate-pulse">Loading trade history…</p>
   }
 
   if (trades.length === 0) {
-    return (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <p className="text-sm text-slate-500">No trades yet.</p>
-      </div>
-    )
+    return <p className="text-sm text-slate-500">No trades yet.</p>
   }
 
   return (
-    <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
-      <div className="px-4 py-2 border-b border-slate-700">
-        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Trade History</h3>
-      </div>
-      <div className="max-h-64 overflow-y-auto">
+    <div className="overflow-hidden">
+      <div className="max-h-96 overflow-y-auto">
         {trades.map((trade) => (
-          <div key={trade.id} className="px-4 py-3 border-b border-slate-700/50 last:border-0">
+          <div key={trade.id} className="py-3 border-b border-slate-700/50 last:border-0">
             {/* Row 1: badge + ticker + total */}
             <div className="flex items-center gap-2">
               <span className={`rounded-full px-2 py-0.5 text-xs font-semibold shrink-0 ${ACTION_STYLES[trade.action]}`}>

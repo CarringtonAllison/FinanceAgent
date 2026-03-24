@@ -62,7 +62,7 @@ describe('App', () => {
     render(<App />)
     await waitFor(() => screen.getByText(/backend connected/i))
 
-    const input = screen.getByRole('textbox')
+    const input = screen.getByPlaceholderText('AAPL')
     await userEvent.type(input, 'AAPL')
     await userEvent.click(screen.getByRole('button', { name: /analyze/i }))
 
@@ -81,7 +81,7 @@ describe('App', () => {
     render(<App />)
     await waitFor(() => screen.getByText(/backend connected/i))
 
-    const input = screen.getByRole('textbox')
+    const input = screen.getByPlaceholderText('AAPL')
     await userEvent.type(input, 'AAPL')
     await userEvent.click(screen.getByRole('button', { name: /analyze/i }))
 

@@ -165,9 +165,9 @@ export function App() {
   }
 
   const statusConfig = {
-    connecting: { label: 'Connecting...', classes: 'text-yellow-400 border-yellow-400/25 bg-yellow-400/10' },
-    connected:  { label: 'Backend Connected', classes: 'text-green-400 border-green-400/25 bg-green-400/10' },
-    offline:    { label: 'Backend Offline', classes: 'text-red-400 border-red-400/25 bg-red-400/10' },
+    connecting: { label: 'Connecting...' },
+    connected:  { label: 'Backend Connected' },
+    offline:    { label: 'Backend Offline' },
   }
 
   const { label } = statusConfig[backendStatus]
@@ -199,88 +199,106 @@ export function App() {
       </header>
 
       <div className="flex flex-col gap-4 p-4 sm:p-6 flex-1">
-      {errorMessage && (
-        <ErrorBanner message={errorMessage} onDismiss={() => setErrorMessage(null)} />
-      )}
+        {errorMessage && (
+          <ErrorBanner message={errorMessage} onDismiss={() => setErrorMessage(null)} />
+        )}
 
-      {/* Two-column body */}
-      <div className="flex flex-col lg:flex-row gap-6 flex-1">
+        {/* Three-column body */}
+        <div className="flex flex-col xl:flex-row gap-4 flex-1">
 
-        {/* Left pane — wallet + positions + history */}
-        <div className="w-full lg:w-72 shrink-0 flex flex-col gap-4">
-          <PortfolioBar
-            cashBalance={portfolio?.cash_balance ?? 0}
-            totalValue={portfolio?.total_value ?? 0}
-            totalUnrealizedPnl={portfolio?.total_unrealized_pnl ?? 0}
-            loading={portfolioLoading}
-          />
-          <div className="overflow-x-auto">
-            <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
-          </div>
-          <TradeHistoryLog trades={trades} loading={portfolioLoading} />
-        </div>
-
-        {/* Right pane */}
-        <div className="flex-1 flex flex-col gap-4 min-w-0">
-
-          {/* Search + agent progress — unified card */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
-            <div className="p-4">
-              <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
+          {/* Left pane — wallet & portfolio */}
+          <div className="w-full xl:w-64 shrink-0 flex flex-col gap-3">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
+              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Wallet</span>
+              </div>
+              <div className="p-3">
+                <PortfolioBar
+                  cashBalance={portfolio?.cash_balance ?? 0}
+                  totalValue={portfolio?.total_value ?? 0}
+                  totalUnrealizedPnl={portfolio?.total_unrealized_pnl ?? 0}
+                  loading={portfolioLoading}
+                />
+              </div>
             </div>
-            {ticker && Object.keys(agentProgress).length > 0 && (
-              <div className="border-t border-slate-800 px-2">
-                <AgentProgressTracker agents={agentProgress} />
+
+            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden flex-1">
+              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Holdings</span>
               </div>
-            )}
+              <div className="p-3">
+                <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
+              </div>
+            </div>
           </div>
 
-          {/* Price chart */}
-          <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
-
-          {ticker && (
-            <div className="flex flex-col gap-4">
-
-              {/* AI Analysis section */}
-              <div className="rounded-xl border border-slate-800 overflow-hidden">
-                <div className="px-5 py-2.5 bg-slate-800/50 border-b border-slate-800">
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">AI Analysis</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800">
-                  <div className="p-5">
-                    <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
-                  </div>
-                  <div className="p-5">
-                    <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
-                  </div>
-                </div>
+          {/* Middle pane — search & chart */}
+          <div className="flex-1 flex flex-col gap-4 min-w-0">
+            {/* Search + agent progress — unified card */}
+            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
+              <div className="p-4">
+                <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
               </div>
-
-              {/* Execute Trade section */}
-              <div className="rounded-xl border border-slate-800 overflow-hidden">
-                <div className="px-5 py-2.5 bg-slate-800/50 border-b border-slate-800">
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Execute Trade</span>
+              {ticker && Object.keys(agentProgress).length > 0 && (
+                <div className="border-t border-slate-800 px-2">
+                  <AgentProgressTracker agents={agentProgress} />
                 </div>
-                <div className="p-5">
-                  <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
-                </div>
-              </div>
-
-              {reportFilename && (
-                <a
-                  href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
-                  download={reportFilename}
-                  className="self-start rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-400 hover:bg-slate-800 transition-colors"
-                >
-                  Download Report ({reportFilename})
-                </a>
               )}
             </div>
-          )}
+
+            {/* Price chart */}
+            <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
+          </div>
+
+          {/* Right pane — execute trade & history */}
+          <div className="w-full xl:w-72 shrink-0 flex flex-col gap-3">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
+              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Execute Trade</span>
+              </div>
+              <div className="p-4">
+                <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
+              </div>
+            </div>
+
+            {reportFilename && (
+              <a
+                href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
+                download={reportFilename}
+                className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-400 hover:bg-slate-800 transition-colors text-center"
+              >
+                Download Report ({reportFilename})
+              </a>
+            )}
+
+            <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden flex-1">
+              <div className="px-4 py-2.5 bg-slate-800/50 border-b border-slate-800">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Trade History</span>
+              </div>
+              <div className="p-3">
+                <TradeHistoryLog trades={trades} loading={portfolioLoading} />
+              </div>
+            </div>
+          </div>
 
         </div>
 
-      </div>
+        {/* AI Analysis — full width below all panes */}
+        {ticker && (
+          <div className="rounded-xl border border-slate-800 overflow-hidden">
+            <div className="px-5 py-2.5 bg-slate-800/50 border-b border-slate-800">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">AI Analysis</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800">
+              <div className="p-5">
+                <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
+              </div>
+              <div className="p-5">
+                <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
 

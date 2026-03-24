@@ -25,32 +25,24 @@ function pnlColor(pnl: number): string {
 
 export function PositionsTable({ positions, loading }: PositionsTableProps) {
   if (loading) {
-    return (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <p className="text-sm text-slate-500 animate-pulse">Loading positions…</p>
-      </div>
-    )
+    return <p className="text-sm text-slate-500 animate-pulse">Loading positions…</p>
   }
 
   if (positions.length === 0) {
-    return (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <p className="text-sm text-slate-500">No open positions.</p>
-      </div>
-    )
+    return <p className="text-sm text-slate-500">No open positions.</p>
   }
 
   return (
-    <div className="rounded-lg border border-slate-700 bg-slate-800 overflow-hidden">
+    <div className="overflow-hidden">
       {/* Column headers — each label appears once */}
-      <div className="grid grid-cols-3 px-4 py-2 border-b border-slate-700 bg-slate-800/80">
+      <div className="grid grid-cols-3 pb-2 mb-1 border-b border-slate-700/50">
         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Ticker</span>
         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Shares</span>
         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-right">Avg Cost</span>
       </div>
 
       {positions.map((pos) => (
-        <div key={pos.ticker} className="px-4 py-3 border-b border-slate-700/50 last:border-0">
+        <div key={pos.ticker} className="py-3 border-b border-slate-700/50 last:border-0">
           {/* Row 1: ticker + shares + avg cost */}
           <div className="grid grid-cols-3 mb-2">
             <span className="font-bold text-slate-100">{pos.ticker}</span>
