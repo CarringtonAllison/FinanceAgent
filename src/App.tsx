@@ -220,17 +220,17 @@ export function App() {
           <TradeHistoryLog trades={trades} loading={portfolioLoading} />
         </div>
 
-        {/* Right pane — search, chart, analysis, trading */}
+        {/* Right pane — search, analysis, chart, trading */}
         <div className="flex-1 flex flex-col gap-6 min-w-0">
           <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
-
-          <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
 
           {ticker && (
             <div className="flex flex-col gap-6">
               {Object.keys(agentProgress).length > 0 && (
                 <AgentProgressTracker agents={agentProgress} />
               )}
+
+              <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
@@ -250,6 +250,8 @@ export function App() {
               )}
             </div>
           )}
+
+          {!ticker && <PriceChart bars={[]} ticker={null} streamUrl={null} />}
         </div>
 
       </div>
