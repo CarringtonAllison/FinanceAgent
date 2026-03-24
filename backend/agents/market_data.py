@@ -51,7 +51,7 @@ class MarketDataAgent:
     async def stream_bars(self, ticker: str) -> AsyncGenerator[dict, None]:
         queue: list[dict] = []
 
-        def on_bar(bar: object) -> None:
+        async def on_bar(bar: object) -> None:
             import alpaca.data.models as models
             if isinstance(bar, models.Bar):
                 queue.append(

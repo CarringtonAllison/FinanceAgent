@@ -58,3 +58,4 @@ This project follows strict TDD. For every new feature:
 _Rules added from corrections during development. Added as they occur._
 
 - When testing agents that check `os.getenv()`, use `patch.dict("os.environ", {"KEY": "test-value"})` rather than patching `os.getenv` directly — discovered 2026-03-23
+- Alpaca `subscribe_bars` (and all WebSocket handlers) require `async def` callbacks — a plain `def` raises `ValueError: handler must be a coroutine function` — discovered 2026-03-24
