@@ -10,6 +10,7 @@ MOCK_ASSETS = [
     {"symbol": "AAPI", "name": "Immunovant Inc."},
     {"symbol": "MSFT", "name": "Microsoft Corporation"},
     {"symbol": "AMZN", "name": "Amazon.com Inc."},
+    {"symbol": "ACN",  "name": "Accenture plc"},
 ]
 
 
@@ -58,6 +59,48 @@ async def test_search_returns_symbol_and_name_fields() -> None:
     assert len(data) >= 1
     assert "symbol" in data[0]
     assert "name" in data[0]
+
+
+@pytest.mark.asyncio
+async def test_search_matches_company_name() -> None:
+    with patch("backend.routers.assets._load_assets", return_value=MOCK_ASSETS):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/assets/search?q=Accenture")
+    symbols = [d["symbol"] for d in response.json()]
+    assert "ACN" in symbols
+
+
+@pytest.mark.asyncio
+async def test_name_search_is_case_insensitive() -> None:
+    with patch("backend.routers.assets._load_assets", return_value=MOCK_ASSETS):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/assets/search?q=accenture")
+    symbols = [d["symbol"] for d in response.json()]
+    assert "ACN" in symbols
+
+
+@pytest.mark.asyncio
+async def test_symbol_matches_ranked_before_name_matches() -> None:
+    assets = [
+        {"symbol": "MSFT", "name": "Microsoft Corporation"},
+        {"symbol": "APLE", "name": "Apple Hospitality REIT"},
+        {"symbol": "AAPL", "name": "Apple Inc."},
+    ]
+    with patch("backend.routers.assets._load_assets", return_value=assets):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/assets/search?q=AAPL")
+    symbols = [d["symbol"] for d in response.json()]
+    # AAPL is a symbol prefix match — must come before APLE (name contains "Apple")
+    assert symbols.index("AAPL") < symbols.index("APLE")
+
+
+@pytest.mark.asyncio
+async def test_no_duplicate_results_when_symbol_and_name_both_match() -> None:
+    assets = [{"symbol": "AAPL", "name": "Apple AAPL Inc."}]
+    with patch("backend.routers.assets._load_assets", return_value=assets):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/assets/search?q=AAPL")
+    assert len(response.json()) == 1
 
 
 @pytest.mark.asyncio
