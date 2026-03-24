@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   createChart,
   CandlestickSeries,
@@ -24,30 +24,28 @@ interface PriceChartProps {
   streamUrl: string | null
 }
 
-export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
-  if (!ticker) {
-    return (
-      <div
-        data-testid="price-chart-placeholder"
-        className="flex h-[320px] w-full items-center justify-center rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a]"
-      >
-        <p className="text-sm text-slate-500">Enter a ticker symbol to view the chart.</p>
-      </div>
-    )
-  }
+function fmt(price: number): string {
+  return price.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  })
+}
 
+export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
   const rafRef = useRef<number | null>(null)
+  const [currentPrice, setCurrentPrice] = useState<number | null>(null)
+  const [priceUp, setPriceUp] = useState<boolean>(true)
 
   useEffect(() => {
     if (!containerRef.current) return
 
     const chart = createChart(containerRef.current, {
       layout: {
-        background: { type: ColorType.Solid, color: '#111827' },
+        background: { type: ColorType.Solid, color: '#0d1f1a' },
         textColor: '#94a3b8',
       },
       grid: {
@@ -63,12 +61,12 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
     })
 
     const series = chart.addSeries(CandlestickSeries, {
-      upColor: '#4ade80',
-      downColor: '#f87171',
-      borderUpColor: '#4ade80',
-      borderDownColor: '#f87171',
-      wickUpColor: '#4ade80',
-      wickDownColor: '#f87171',
+      upColor: '#6EC5A2',
+      downColor: '#F4532B',
+      borderUpColor: '#6EC5A2',
+      borderDownColor: '#F4532B',
+      wickUpColor: '#6EC5A2',
+      wickDownColor: '#F4532B',
     })
 
     chartRef.current = chart
@@ -94,6 +92,10 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
       close: b.close,
     }))
     seriesRef.current.setData(data)
+
+    const lastBar = bars[bars.length - 1]
+    setCurrentPrice(lastBar.close)
+    setPriceUp(lastBar.close >= lastBar.open)
 
     // Cancel any in-progress animation from a previous load
     if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
@@ -143,6 +145,8 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
         low: bar.low,
         close: bar.close,
       })
+      setCurrentPrice(bar.close)
+      setPriceUp(bar.close >= bar.open)
     }
 
     return () => {
@@ -151,11 +155,34 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
     }
   }, [streamUrl])
 
+  if (!ticker) {
+    return (
+      <div
+        data-testid="price-chart-placeholder"
+        className="flex h-[320px] w-full items-center justify-center rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a]"
+      >
+        <p className="text-sm text-slate-500">Enter a ticker symbol to view the chart.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full bg-[#0d1f1a] border border-[#1AAA89]/25 rounded-xl p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-slate-100 font-bold text-lg font-mono">{ticker}</span>
-        <span className="text-xs text-slate-500">1 Min</span>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-100 font-bold text-lg font-mono">{ticker}</span>
+          <span className="text-xs text-slate-500">1 Min</span>
+        </div>
+        {currentPrice !== null && (
+          <div className="flex items-center gap-1.5">
+            <span className={`text-xl font-bold font-mono tabular-nums transition-colors duration-300 ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
+              ${fmt(currentPrice)}
+            </span>
+            <span className={`text-xs ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
+              {priceUp ? '▲' : '▼'}
+            </span>
+          </div>
+        )}
       </div>
       <div ref={containerRef} data-testid="price-chart" className="w-full" />
     </div>
