@@ -54,6 +54,10 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
         vertLines: { color: '#1e293b' },
         horzLines: { color: '#1e293b' },
       },
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
       width: containerRef.current.clientWidth,
       height: 320,
     })
