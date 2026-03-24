@@ -40,7 +40,7 @@ export function TradeHistoryLog({ trades, loading }: TradeHistoryLogProps) {
 
   return (
     <div className="overflow-hidden">
-      <div className="max-h-96 overflow-y-auto">
+      <div>
         {trades.map((trade) => (
           <div key={trade.id} className="py-3 border-b border-slate-700/50 last:border-0">
             {/* Row 1: badge + ticker + total */}

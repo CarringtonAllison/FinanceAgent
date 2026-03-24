@@ -204,7 +204,7 @@ export function App() {
         )}
 
         {/* Three-column body */}
-        <div className="flex flex-col xl:flex-row gap-4 flex-1">
+        <div className="flex flex-col xl:flex-row gap-4 items-start">
 
           {/* Left pane — wallet & portfolio */}
           <div className="w-full xl:w-64 shrink-0 flex flex-col gap-3">
@@ -222,11 +222,11 @@ export function App() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden flex-1">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden">
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Holdings</span>
               </div>
-              <div className="p-3">
+              <div className="p-3 max-h-[320px] overflow-y-auto">
                 <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
               </div>
             </div>
@@ -261,21 +261,11 @@ export function App() {
               </div>
             </div>
 
-            {reportFilename && (
-              <a
-                href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
-                download={reportFilename}
-                className="rounded-lg border border-[#1AAA89]/30 px-4 py-2 text-sm text-[#6EC5A2] hover:bg-[#1AAA89]/10 transition-colors text-center"
-              >
-                Download Report ({reportFilename})
-              </a>
-            )}
-
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden flex-1">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden">
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Trade History</span>
               </div>
-              <div className="p-3">
+              <div className="p-3 max-h-[320px] overflow-y-auto">
                 <TradeHistoryLog trades={trades} loading={portfolioLoading} />
               </div>
             </div>
@@ -302,14 +292,23 @@ export function App() {
 
       </div>
 
-      {/* Footer — backend status */}
-      <footer className="border-t border-[#1AAA89]/20 px-6 py-2 flex items-center gap-2">
+      {/* Footer — backend status + report download */}
+      <footer className="border-t border-[#1AAA89]/20 px-6 py-2 flex items-center gap-4">
         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
           backendStatus === 'connected' ? 'bg-[#1AAA89]' :
           backendStatus === 'connecting' ? 'bg-[#F7E460] animate-pulse' :
           'bg-[#F4532B]'
         }`} />
         <span className="text-xs text-slate-500">{label}</span>
+        {reportFilename && (
+          <a
+            href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
+            download={reportFilename}
+            className="ml-auto text-xs text-[#6EC5A2] hover:text-[#1AAA89] transition-colors"
+          >
+            ↓ Download Report ({reportFilename})
+          </a>
+        )}
       </footer>
     </div>
   )
