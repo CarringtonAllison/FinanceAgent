@@ -21,9 +21,10 @@ describe('App', () => {
   })
 
   it('renders the app title', () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ status: 'ok', service: 'finance-agent' }), { status: 200 })
-    )
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'ok', service: 'finance-agent' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ cash_balance: 0, total_value: 0, positions: [], total_unrealized_pnl: 0 }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ trades: [] }), { status: 200 }))
     render(<App />)
     expect(screen.getByText('Finance Agent')).toBeInTheDocument()
   })
@@ -35,9 +36,10 @@ describe('App', () => {
   })
 
   it('shows backend connected when health check succeeds', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ status: 'ok', service: 'finance-agent' }), { status: 200 })
-    )
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'ok', service: 'finance-agent' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ cash_balance: 0, total_value: 0, positions: [], total_unrealized_pnl: 0 }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ trades: [] }), { status: 200 }))
     render(<App />)
     await waitFor(() => {
       expect(screen.getByText(/backend connected/i)).toBeInTheDocument()

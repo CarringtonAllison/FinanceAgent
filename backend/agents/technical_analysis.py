@@ -9,7 +9,11 @@ MINIMUM_BARS = 26  # enough for MACD (26-period slow EMA)
 class TechnicalAnalysisAgent:
     def analyze(self, bars: list[dict]) -> dict:
         if len(bars) < MINIMUM_BARS:
-            raise ValueError(f"Need minimum {MINIMUM_BARS} bars, got {len(bars)}")
+            raise ValueError(
+                f"Not enough price history for technical analysis — need at least "
+                f"{MINIMUM_BARS} 1-minute bars but only {len(bars)} are available. "
+                f"This usually means the stock has very low trading volume today."
+            )
 
         df = pd.DataFrame(bars)
         close = df["close"]

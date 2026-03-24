@@ -18,7 +18,7 @@ class PortfolioAgent:
         if action == "BUY":
             if portfolio.cash_balance < total:
                 raise ValueError(
-                    f"insufficient cash: need {total:.2f}, have {portfolio.cash_balance:.2f}"
+                    f"Insufficient funds: this trade costs ${total:,.2f} but your cash balance is only ${portfolio.cash_balance:,.2f}."
                 )
             position = session.query(Position).filter_by(ticker=ticker).first()
             if position:
@@ -33,10 +33,10 @@ class PortfolioAgent:
         elif action == "SELL":
             position = session.query(Position).filter_by(ticker=ticker).first()
             if not position:
-                raise ValueError(f"no position in {ticker} to sell")
+                raise ValueError(f"You don't hold any {ticker} shares to sell.")
             if position.shares < shares:
                 raise ValueError(
-                    f"insufficient shares: need {shares}, have {position.shares}"
+                    f"Not enough shares: you want to sell {shares} {ticker} but only hold {position.shares}."
                 )
             position.shares -= shares
             if position.shares == 0:

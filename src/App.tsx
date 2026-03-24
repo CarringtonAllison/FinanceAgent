@@ -152,7 +152,7 @@ export function App() {
       setStreamUrl(`http://localhost:8000/market-data/${symbol}/stream`)
     } catch {
       setLoading(false)
-      setErrorMessage('Could not reach the backend. Is it running?')
+      setErrorMessage(`Could not connect to the backend while fetching data for ${symbol}. Make sure the server is running.`)
       return
     }
 
@@ -170,7 +170,12 @@ export function App() {
       if (payload.agent === 'done') {
         es.close()
         setLoading(false)
-        if (payload.report) setReportFilename(payload.report)
+        if (payload.status === 'error') {
+          const errResult = payload.result as { error?: string } | null
+          setErrorMessage(errResult?.error ?? 'The analysis pipeline encountered an unexpected error.')
+        } else if (payload.report) {
+          setReportFilename(payload.report as string)
+        }
         return
       }
 
@@ -190,7 +195,7 @@ export function App() {
     es.onerror = () => {
       es.close()
       setLoading(false)
-      setErrorMessage('Analysis stream failed. Please try again.')
+      setErrorMessage(`Lost connection to the analysis stream for ${symbol}. Check that the backend is still running and try again.`)
     }
   }
 

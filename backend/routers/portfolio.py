@@ -33,7 +33,7 @@ def get_portfolio() -> dict:
 @router.post("/trade")
 def execute_trade(request: TradeRequest) -> dict:
     if request.shares <= 0:
-        raise HTTPException(status_code=400, detail="shares must be greater than 0")
+        raise HTTPException(status_code=400, detail="Number of shares must be greater than 0.")
     agent = PortfolioAgent()
     with get_db_session() as session:
         try:
