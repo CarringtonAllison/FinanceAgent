@@ -23,6 +23,7 @@ Tech stack: Vite, React 19, TypeScript, Tailwind CSS v4.
   - Bug fix
 - If more than ~3 files changed for unrelated reasons, split into multiple commits
 - Commit message format: `scope: short description` (e.g. `backend: add health endpoint`, `frontend: backend status indicator`, `test: health endpoint TDD`)
+- Do **not** include a `Co-Authored-By` trailer in commit messages
 
 ---
 
