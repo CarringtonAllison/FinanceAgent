@@ -81,3 +81,27 @@ async def test_run_each_agent_has_running_and_complete(agent: OrchestratorAgent)
     statuses = {e["status"] for e in md_events}
     assert "running" in statuses
     assert "complete" in statuses
+
+
+@pytest.mark.asyncio
+async def test_run_continues_after_insufficient_bars(agent: OrchestratorAgent) -> None:
+    """Pipeline should not crash when TA raises ValueError; downstream agents still run."""
+    with patch("backend.agents.orchestrator.MarketDataAgent") as MockMD, \
+         patch("backend.agents.orchestrator.TechnicalAnalysisAgent") as MockTA, \
+         patch("backend.agents.orchestrator.SentimentAgent") as MockSent, \
+         patch("backend.agents.orchestrator.RecommendationAgent") as MockRec, \
+         patch("backend.agents.orchestrator.OrchestratorAgent._write_report", return_value="X_test.json"):
+        MockMD.return_value.get_bars.return_value = MOCK_BARS
+        MockMD.return_value.get_snapshot.return_value = MOCK_SNAPSHOT
+        MockTA.return_value.analyze.side_effect = ValueError("Need minimum 26 bars, got 4")
+        MockSent.return_value.analyze.return_value = MOCK_SENTIMENT
+        MockRec.return_value.analyze.return_value = MOCK_RECOMMENDATION
+
+        events = [event async for event in agent.run("AAPY")]
+
+    agent_names = [e["agent"] for e in events]
+    ta_event = next(e for e in events if e["agent"] == "technical_analysis" and e["status"] == "error")
+    assert "error" in ta_event["result"]
+    assert "sentiment" in agent_names
+    assert "recommendation" in agent_names
+    assert "done" in agent_names

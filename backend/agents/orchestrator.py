@@ -30,9 +30,13 @@ class OrchestratorAgent:
         # --- Technical Analysis ---
         yield {"agent": "technical_analysis", "status": "running", "result": None}
         ta_agent = TechnicalAnalysisAgent()
-        ta_result = ta_agent.analyze(bars)
-        signals = ta_result.get("signals", {})
-        yield {"agent": "technical_analysis", "status": "complete", "result": signals}
+        try:
+            ta_result = ta_agent.analyze(bars)
+            signals = ta_result.get("signals", {})
+            yield {"agent": "technical_analysis", "status": "complete", "result": signals}
+        except ValueError as exc:
+            yield {"agent": "technical_analysis", "status": "error", "result": {"error": str(exc)}}
+            signals = {}
 
         # --- Sentiment ---
         yield {"agent": "sentiment", "status": "running", "result": None}

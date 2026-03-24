@@ -15,9 +15,13 @@ async def run_orchestration(ticker: str) -> StreamingResponse:
     agent = OrchestratorAgent()
 
     async def event_generator():
-        async for event in agent.run(ticker.upper()):
-            yield f"data: {json.dumps(event)}\n\n"
-            await asyncio.sleep(0)
+        try:
+            async for event in agent.run(ticker.upper()):
+                yield f"data: {json.dumps(event)}\n\n"
+                await asyncio.sleep(0)
+        except Exception as exc:
+            error_event = {"agent": "done", "status": "error", "result": {"error": str(exc)}}
+            yield f"data: {json.dumps(error_event)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
