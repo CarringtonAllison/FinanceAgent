@@ -220,30 +220,57 @@ export function App() {
           <TradeHistoryLog trades={trades} loading={portfolioLoading} />
         </div>
 
-        {/* Right pane — search, analysis, chart, trading */}
-        <div className="flex-1 flex flex-col gap-6 min-w-0">
-          <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
+        {/* Right pane */}
+        <div className="flex-1 flex flex-col gap-4 min-w-0">
+
+          {/* Search + agent progress — unified card */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
+            <div className="p-4">
+              <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
+            </div>
+            {ticker && Object.keys(agentProgress).length > 0 && (
+              <div className="border-t border-slate-800 px-2">
+                <AgentProgressTracker agents={agentProgress} />
+              </div>
+            )}
+          </div>
+
+          {/* Price chart */}
+          <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
 
           {ticker && (
-            <div className="flex flex-col gap-6">
-              {Object.keys(agentProgress).length > 0 && (
-                <AgentProgressTracker agents={agentProgress} />
-              )}
+            <div className="flex flex-col gap-4">
 
-              <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
-                <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
+              {/* AI Analysis section */}
+              <div className="rounded-xl border border-slate-800 overflow-hidden">
+                <div className="px-5 py-2.5 bg-slate-800/50 border-b border-slate-800">
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">AI Analysis</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800">
+                  <div className="p-5">
+                    <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
+                  </div>
+                  <div className="p-5">
+                    <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
+                  </div>
+                </div>
               </div>
 
-              <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
+              {/* Execute Trade section */}
+              <div className="rounded-xl border border-slate-800 overflow-hidden">
+                <div className="px-5 py-2.5 bg-slate-800/50 border-b border-slate-800">
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Execute Trade</span>
+                </div>
+                <div className="p-5">
+                  <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
+                </div>
+              </div>
 
               {reportFilename && (
                 <a
                   href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
                   download={reportFilename}
-                  className="self-start rounded-lg border border-slate-600 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
+                  className="self-start rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-400 hover:bg-slate-800 transition-colors"
                 >
                   Download Report ({reportFilename})
                 </a>
@@ -251,7 +278,6 @@ export function App() {
             </div>
           )}
 
-          {!ticker && <PriceChart bars={[]} ticker={null} streamUrl={null} />}
         </div>
 
       </div>
