@@ -9,8 +9,9 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
   const [ticker, setTicker] = useState('')
 
   function handleSubmit() {
-    if (!ticker.trim()) return
-    onAnalyze(ticker)
+    const trimmed = ticker.trim()
+    if (!trimmed) return
+    onAnalyze(trimmed)
   }
 
   return (
