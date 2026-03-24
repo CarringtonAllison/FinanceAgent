@@ -17,6 +17,17 @@ import { TradePanel } from './components/TradePanel'
 
 type BackendStatus = 'connecting' | 'connected' | 'offline'
 
+const QUOTES = [
+  { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+  { text: "The four most dangerous words in investing: 'This time it's different.'", author: "Sir John Templeton" },
+  { text: "The market can stay irrational longer than you can stay solvent.", author: "John Maynard Keynes" },
+  { text: "In investing, what is comfortable is rarely profitable.", author: "Robert Arnott" },
+  { text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
+  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+  { text: "October: one of the peculiarly dangerous months to speculate in stocks.", author: "Mark Twain" },
+  { text: "The best investment you can make is in yourself.", author: "Warren Buffett" },
+]
+
 interface Bar {
   time: number
   open: number
@@ -62,6 +73,25 @@ export function App() {
   const [portfolioLoading, setPortfolioLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
+  const [quoteIndex, setQuoteIndex] = useState(0)
+  const [quoteVisible, setQuoteVisible] = useState(true)
+  const [clock, setClock] = useState(() => new Date())
+
+  useEffect(() => {
+    const tick = setInterval(() => setClock(new Date()), 1000)
+    return () => clearInterval(tick)
+  }, [])
+
+  useEffect(() => {
+    const cycle = setInterval(() => {
+      setQuoteVisible(false)
+      setTimeout(() => {
+        setQuoteIndex((i) => (i + 1) % QUOTES.length)
+        setQuoteVisible(true)
+      }, 500)
+    }, 8000)
+    return () => clearInterval(cycle)
+  }, [])
 
   const fetchPortfolio = useCallback(async () => {
     setPortfolioLoading(true)
@@ -186,14 +216,38 @@ export function App() {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="border-b border-[#1AAA89]/30 bg-[#0d1f1a]/80 backdrop-blur-sm sticky top-0 z-20">
-        <div className="flex items-center gap-3 px-6 py-4">
-          <svg className="w-6 h-6 text-[#1AAA89] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-            <polyline points="16 7 22 7 22 13" />
-          </svg>
-          <div>
-            <h1 className="text-base font-bold tracking-tight text-slate-100 leading-none">Finance Agent</h1>
-            <p className="text-xs text-slate-500 mt-0.5">AI-Powered Paper Trading</p>
+        <div className="flex items-center gap-4 px-6 py-3">
+          {/* Logo + title */}
+          <div className="flex items-center gap-3 shrink-0">
+            <svg className="w-6 h-6 text-[#1AAA89] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+              <polyline points="16 7 22 7 22 13" />
+            </svg>
+            <div>
+              <h1 className="text-base font-bold tracking-tight text-slate-100 leading-none">Finance Agent</h1>
+              <p className="text-xs text-slate-500 mt-0.5">AI-Powered Paper Trading</p>
+            </div>
+          </div>
+
+          {/* Rotating quote */}
+          <div className="flex-1 flex justify-center px-4 overflow-hidden">
+            <p
+              className="text-xs text-center italic transition-opacity duration-500 max-w-xl"
+              style={{ opacity: quoteVisible ? 1 : 0 }}
+            >
+              <span className="text-slate-400">"{QUOTES[quoteIndex].text}"</span>
+              <span className="text-[#6EC5A2] ml-1.5 not-italic">— {QUOTES[quoteIndex].author}</span>
+            </p>
+          </div>
+
+          {/* Live clock */}
+          <div className="shrink-0 text-right">
+            <p className="text-sm font-mono font-semibold text-slate-200 tabular-nums">
+              {clock.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {clock.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </p>
           </div>
         </div>
       </header>
