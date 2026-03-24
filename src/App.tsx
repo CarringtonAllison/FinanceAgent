@@ -170,7 +170,7 @@ export function App() {
     offline:    { label: 'Backend Offline', classes: 'text-red-400 border-red-400/25 bg-red-400/10' },
   }
 
-  const { label, classes } = statusConfig[backendStatus]
+  const { label } = statusConfig[backendStatus]
 
   const mappedPositions: Position[] = (portfolio?.positions ?? []).map((p) => ({
     ticker: p.ticker,
@@ -183,15 +183,22 @@ export function App() {
   }))
 
   return (
-    <div className="min-h-screen flex flex-col gap-4 p-4 sm:p-6">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-100">Finance Agent</h1>
-        <span className={`text-xs font-semibold tracking-widest border px-3 py-1 rounded-full ${classes}`}>
-          {label}
-        </span>
-      </div>
+      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-20">
+        <div className="flex items-center gap-3 px-6 py-4">
+          <svg className="w-6 h-6 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+            <polyline points="16 7 22 7 22 13" />
+          </svg>
+          <div>
+            <h1 className="text-base font-bold tracking-tight text-slate-100 leading-none">Finance Agent</h1>
+            <p className="text-xs text-slate-500 mt-0.5">AI-Powered Paper Trading</p>
+          </div>
+        </div>
+      </header>
 
+      <div className="flex flex-col gap-4 p-4 sm:p-6 flex-1">
       {errorMessage && (
         <ErrorBanner message={errorMessage} onDismiss={() => setErrorMessage(null)} />
       )}
@@ -246,6 +253,18 @@ export function App() {
         </div>
 
       </div>
+
+      </div>
+
+      {/* Footer — backend status */}
+      <footer className="border-t border-slate-800 px-6 py-2 flex items-center gap-2">
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+          backendStatus === 'connected' ? 'bg-green-400' :
+          backendStatus === 'connecting' ? 'bg-yellow-400 animate-pulse' :
+          'bg-red-400'
+        }`} />
+        <span className="text-xs text-slate-500">{label}</span>
+      </footer>
     </div>
   )
 }
