@@ -16,8 +16,10 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
   const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
 
   useEffect(() => {
     return () => {
@@ -39,6 +41,18 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [showDropdown])
+
+  // Reset active index whenever suggestion list changes
+  useEffect(() => {
+    setActiveIndex(-1)
+  }, [suggestions])
+
+  // Scroll active item into view
+  useEffect(() => {
+    if (activeIndex < 0 || !listRef.current) return
+    const item = listRef.current.children[activeIndex] as HTMLElement | undefined
+    item?.scrollIntoView?.({ block: 'nearest' })
+  }, [activeIndex])
 
   function handleChange(value: string) {
     const upper = value.toUpperCase()
@@ -69,6 +83,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
     setTicker(symbol)
     setSuggestions([])
     setShowDropdown(false)
+    setActiveIndex(-1)
     onAnalyze(symbol)
   }
 
@@ -77,12 +92,39 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
     if (!trimmed) return
     setSuggestions([])
     setShowDropdown(false)
+    setActiveIndex(-1)
     onAnalyze(trimmed)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!showDropdown) {
+      if (e.key === 'Enter') handleSubmit()
+      return
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.max(i - 1, -1))
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (activeIndex >= 0 && suggestions[activeIndex]) {
+        handleSelect(suggestions[activeIndex].symbol)
+      } else {
+        handleSubmit()
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false)
+      setActiveIndex(-1)
+    }
   }
 
   const dropdown = showDropdown && dropdownRect
     ? createPortal(
         <ul
+          ref={listRef}
           data-testid="suggestions-dropdown"
           style={{
             position: 'fixed',
@@ -92,14 +134,19 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
           }}
           className="z-50 rounded-lg border border-[#1AAA89]/30 bg-[#0d1f1a] shadow-xl overflow-hidden"
         >
-          {suggestions.map((s) => (
+          {suggestions.map((s, i) => (
             <li
               key={s.symbol}
               onMouseDown={(e) => e.preventDefault()}
+              onMouseEnter={() => setActiveIndex(i)}
               onClick={() => handleSelect(s.symbol)}
-              className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[#162820] transition-colors"
+              className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${
+                i === activeIndex ? 'bg-[#1AAA89]/20 text-[#6EC5A2]' : 'hover:bg-[#162820]'
+              }`}
             >
-              <span className="font-mono font-bold text-slate-100 w-16 shrink-0">{s.symbol}</span>
+              <span className={`font-mono font-bold w-16 shrink-0 ${i === activeIndex ? 'text-[#6EC5A2]' : 'text-slate-100'}`}>
+                {s.symbol}
+              </span>
               <span className="text-sm text-slate-400 truncate">{s.name}</span>
             </li>
           ))}
@@ -116,8 +163,8 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
           type="text"
           value={ticker}
           onChange={(e) => handleChange(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          onBlur={() => setShowDropdown(false)}
+          onKeyDown={handleKeyDown}
+          onBlur={() => { setShowDropdown(false); setActiveIndex(-1) }}
           placeholder="AAPL"
           className="w-full bg-[#0d1f1a] border border-[#1AAA89]/30 rounded-lg px-4 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-[#1AAA89] uppercase tracking-widest font-mono"
         />
