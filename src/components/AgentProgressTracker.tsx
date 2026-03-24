@@ -47,7 +47,7 @@ export function AgentProgressTracker({ agents }: AgentProgressTrackerProps) {
   const steps = AGENT_ORDER.filter((name) => name in agents)
 
   return (
-    <div className="flex items-start w-full px-1 py-2">
+    <div className="flex items-start w-full px-4 py-3">
       {steps.map((name, i) => {
         const state = agents[name]
         const isLast = i === steps.length - 1
@@ -63,7 +63,7 @@ export function AgentProgressTracker({ agents }: AgentProgressTrackerProps) {
                 <span className="sr-only transition-all duration-300">{state.status}</span>
                 <span aria-hidden="true">{ICON[state.status]}</span>
               </div>
-              <span className="text-xs text-slate-400 text-center leading-tight max-w-[64px]">
+              <span className="text-xs text-slate-400 text-center leading-tight w-[90px]">
                 {AGENT_LABELS[name] ?? name}
               </span>
             </div>

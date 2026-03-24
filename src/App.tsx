@@ -235,12 +235,12 @@ export function App() {
           {/* Middle pane — search & chart */}
           <div className="flex-1 flex flex-col gap-4 min-w-0">
             {/* Search + agent progress — unified card */}
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden">
-              <div className="p-4">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a]">
+              <div className="p-4 flex justify-center">
                 <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
               </div>
               {ticker && Object.keys(agentProgress).length > 0 && (
-                <div className="border-t border-[#1AAA89]/20 px-2">
+                <div className="border-t border-[#1AAA89]/20">
                   <AgentProgressTracker agents={agentProgress} />
                 </div>
               )}
