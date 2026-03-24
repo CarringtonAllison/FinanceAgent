@@ -42,7 +42,17 @@ class SentimentAgent:
         )
 
         raw = message.content[0].text.strip()
-        parsed: dict = json.loads(raw)
+        # Strip markdown code fences if Claude wrapped the JSON
+        if raw.startswith("```"):
+            raw = "\n".join(
+                line for line in raw.splitlines()
+                if not line.startswith("```")
+            ).strip()
+
+        try:
+            parsed: dict = json.loads(raw)
+        except json.JSONDecodeError:
+            return {"score": "neutral", "confidence": 0.0, "headlines": headlines, "reasoning": "Could not parse sentiment response."}
 
         return {
             "score": parsed.get("score", "neutral"),

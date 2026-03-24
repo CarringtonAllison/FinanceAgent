@@ -46,7 +46,17 @@ class RecommendationAgent:
         )
 
         raw = message.content[0].text.strip()
-        parsed: dict = json.loads(raw)
+        # Strip markdown code fences if Claude wrapped the JSON
+        if raw.startswith("```"):
+            raw = "\n".join(
+                line for line in raw.splitlines()
+                if not line.startswith("```")
+            ).strip()
+
+        try:
+            parsed: dict = json.loads(raw)
+        except json.JSONDecodeError:
+            return {"action": "HOLD", "confidence": 0.5, "reasoning": "Could not parse recommendation response."}
 
         return {
             "action": parsed.get("action", "HOLD"),
