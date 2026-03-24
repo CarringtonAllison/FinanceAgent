@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 interface Suggestion {
   symbol: string
@@ -14,13 +15,30 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
   const [ticker, setTicker] = useState('')
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
+  const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (showDropdown && inputRef.current) {
+      setDropdownRect(inputRef.current.getBoundingClientRect())
+    }
+  }, [showDropdown])
+
+  useEffect(() => {
+    if (!showDropdown) return
+    function onResize() {
+      if (inputRef.current) setDropdownRect(inputRef.current.getBoundingClientRect())
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [showDropdown])
 
   function handleChange(value: string) {
     const upper = value.toUpperCase()
@@ -62,10 +80,39 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
     onAnalyze(trimmed)
   }
 
+  const dropdown = showDropdown && dropdownRect
+    ? createPortal(
+        <ul
+          data-testid="suggestions-dropdown"
+          style={{
+            position: 'fixed',
+            top: dropdownRect.bottom + 4,
+            left: dropdownRect.left,
+            width: dropdownRect.width,
+          }}
+          className="z-50 rounded-lg border border-slate-700 bg-gray-900 shadow-xl overflow-hidden"
+        >
+          {suggestions.map((s) => (
+            <li
+              key={s.symbol}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleSelect(s.symbol)}
+              className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-800 transition-colors"
+            >
+              <span className="font-mono font-bold text-slate-100 w-16 shrink-0">{s.symbol}</span>
+              <span className="text-sm text-slate-400 truncate">{s.name}</span>
+            </li>
+          ))}
+        </ul>,
+        document.body
+      )
+    : null
+
   return (
     <div className="flex gap-3 w-full max-w-md">
       <div className="relative flex-1">
         <input
+          ref={inputRef}
           type="text"
           value={ticker}
           onChange={(e) => handleChange(e.target.value)}
@@ -74,24 +121,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
           placeholder="AAPL"
           className="w-full bg-gray-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-blue-500 uppercase tracking-widest font-mono"
         />
-        {showDropdown && (
-          <ul
-            data-testid="suggestions-dropdown"
-            className="absolute top-full left-0 right-0 z-10 mt-1 rounded-lg border border-slate-700 bg-gray-900 shadow-xl overflow-hidden"
-          >
-            {suggestions.map((s) => (
-              <li
-                key={s.symbol}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleSelect(s.symbol)}
-                className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-800 transition-colors"
-              >
-                <span className="font-mono font-bold text-slate-100 w-16 shrink-0">{s.symbol}</span>
-                <span className="text-sm text-slate-400 truncate">{s.name}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+        {dropdown}
       </div>
       <button
         onClick={handleSubmit}
