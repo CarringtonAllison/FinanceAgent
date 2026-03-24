@@ -40,6 +40,7 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
   const chartRef = useRef<IChartApi | null>(null)
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
+  const rafRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -70,15 +71,17 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
     seriesRef.current = series
 
     return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
       chart.remove()
       chartRef.current = null
       seriesRef.current = null
     }
   }, [])
 
-  // Update series data when bars change
+  // Update series data when bars change, then zoom into current time over 2s
   useEffect(() => {
-    if (!seriesRef.current || bars.length === 0) return
+    if (!seriesRef.current || !chartRef.current || bars.length === 0) return
+
     const data: CandlestickData<Time>[] = bars.map((b) => ({
       time: b.time as Time,
       open: b.open,
@@ -87,6 +90,37 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
       close: b.close,
     }))
     seriesRef.current.setData(data)
+
+    // Cancel any in-progress animation from a previous load
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+
+    const total = data.length
+    const targetFrom = Math.max(0, total - 20)
+    const duration = 2000
+    const startTs = performance.now()
+
+    const easeInOut = (t: number) =>
+      t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+
+    const animate = (now: number) => {
+      const t = Math.min((now - startTs) / duration, 1)
+      const from = easeInOut(t) * targetFrom
+      chartRef.current?.timeScale().setVisibleLogicalRange({ from, to: total - 1 })
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(animate)
+      } else {
+        rafRef.current = null
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
+    }
   }, [bars])
 
   // Subscribe to SSE stream for real-time updates
