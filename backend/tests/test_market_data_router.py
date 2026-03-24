@@ -50,3 +50,23 @@ async def test_get_snapshot_returns_price() -> None:
     data = response.json()
     assert data["price"] == 213.50
     assert data["ticker"] == "AAPL"
+
+
+@pytest.mark.asyncio
+async def test_get_bars_returns_404_for_unknown_ticker() -> None:
+    with patch("backend.routers.market_data.MarketDataAgent") as MockAgent:
+        MockAgent.return_value.get_bars.side_effect = KeyError("No key APPL was found.")
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/market-data/APPL/bars")
+    assert response.status_code == 404
+    assert "APPL" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_get_snapshot_returns_404_for_unknown_ticker() -> None:
+    with patch("backend.routers.market_data.MarketDataAgent") as MockAgent:
+        MockAgent.return_value.get_snapshot.side_effect = KeyError("No key APPL was found.")
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/market-data/APPL/snapshot")
+    assert response.status_code == 404
+    assert "APPL" in response.json()["detail"]
