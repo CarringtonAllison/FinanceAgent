@@ -185,7 +185,7 @@ export function App() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-[#1AAA89]/30 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-20">
+      <header className="border-b border-[#1AAA89]/30 bg-[#0d1f1a]/80 backdrop-blur-sm sticky top-0 z-20">
         <div className="flex items-center gap-3 px-6 py-4">
           <svg className="w-6 h-6 text-[#1AAA89] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
@@ -208,7 +208,7 @@ export function App() {
 
           {/* Left pane — wallet & portfolio */}
           <div className="w-full xl:w-64 shrink-0 flex flex-col gap-3">
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden">
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Wallet</span>
               </div>
@@ -222,7 +222,7 @@ export function App() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden flex-1">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden flex-1">
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Holdings</span>
               </div>
@@ -235,7 +235,7 @@ export function App() {
           {/* Middle pane — search & chart */}
           <div className="flex-1 flex flex-col gap-4 min-w-0">
             {/* Search + agent progress — unified card */}
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden">
               <div className="p-4">
                 <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
               </div>
@@ -252,7 +252,7 @@ export function App() {
 
           {/* Right pane — execute trade & history */}
           <div className="w-full xl:w-72 shrink-0 flex flex-col gap-3">
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden">
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Execute Trade</span>
               </div>
@@ -271,7 +271,7 @@ export function App() {
               </a>
             )}
 
-            <div className="rounded-xl border border-[#1AAA89]/25 bg-slate-900 overflow-hidden flex-1">
+            <div className="rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a] overflow-hidden flex-1">
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Trade History</span>
               </div>
@@ -303,7 +303,7 @@ export function App() {
       </div>
 
       {/* Footer — backend status */}
-      <footer className="border-t border-slate-800 px-6 py-2 flex items-center gap-2">
+      <footer className="border-t border-[#1AAA89]/20 px-6 py-2 flex items-center gap-2">
         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
           backendStatus === 'connected' ? 'bg-[#1AAA89]' :
           backendStatus === 'connecting' ? 'bg-[#F7E460] animate-pulse' :

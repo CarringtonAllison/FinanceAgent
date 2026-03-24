@@ -28,7 +28,7 @@ const ICON: Record<AgentStatus, string> = {
 }
 
 const NODE_STYLES: Record<AgentStatus, string> = {
-  pending:  'border-slate-600 text-slate-500 bg-slate-800/50',
+  pending:  'border-[#1AAA89]/20 text-slate-500 bg-[#162820]/50',
   running:  'border-[#F7E460] text-[#F7E460] bg-[#F7E460]/10 animate-pulse',
   complete: 'border-[#6EC5A2] text-[#6EC5A2] bg-[#6EC5A2]/10',
   error:    'border-[#F4532B] text-[#F4532B] bg-[#F4532B]/10',

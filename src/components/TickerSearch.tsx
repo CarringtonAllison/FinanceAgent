@@ -90,14 +90,14 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
             left: dropdownRect.left,
             width: dropdownRect.width,
           }}
-          className="z-50 rounded-lg border border-slate-700 bg-gray-900 shadow-xl overflow-hidden"
+          className="z-50 rounded-lg border border-[#1AAA89]/30 bg-[#0d1f1a] shadow-xl overflow-hidden"
         >
           {suggestions.map((s) => (
             <li
               key={s.symbol}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(s.symbol)}
-              className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[#162820] transition-colors"
             >
               <span className="font-mono font-bold text-slate-100 w-16 shrink-0">{s.symbol}</span>
               <span className="text-sm text-slate-400 truncate">{s.name}</span>
@@ -119,7 +119,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           onBlur={() => setShowDropdown(false)}
           placeholder="AAPL"
-          className="w-full bg-gray-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-[#1AAA89] uppercase tracking-widest font-mono"
+          className="w-full bg-[#0d1f1a] border border-[#1AAA89]/30 rounded-lg px-4 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-[#1AAA89] uppercase tracking-widest font-mono"
         />
         {dropdown}
       </div>

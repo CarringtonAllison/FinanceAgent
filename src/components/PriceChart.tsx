@@ -29,7 +29,7 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
     return (
       <div
         data-testid="price-chart-placeholder"
-        className="flex h-[320px] w-full items-center justify-center rounded-xl border border-slate-800 bg-gray-900"
+        className="flex h-[320px] w-full items-center justify-center rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a]"
       >
         <p className="text-sm text-slate-500">Enter a ticker symbol to view the chart.</p>
       </div>
@@ -152,7 +152,7 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
   }, [streamUrl])
 
   return (
-    <div className="w-full bg-gray-900 border border-slate-800 rounded-xl p-4">
+    <div className="w-full bg-[#0d1f1a] border border-[#1AAA89]/25 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-slate-100 font-bold text-lg font-mono">{ticker}</span>
         <span className="text-xs text-slate-500">1 Min</span>

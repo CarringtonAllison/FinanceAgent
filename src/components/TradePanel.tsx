@@ -44,7 +44,7 @@ export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
             type="text"
             value={inputTicker}
             onChange={(e) => setInputTicker(e.target.value.toUpperCase())}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-[#1AAA89] font-mono tracking-widest"
+            className="rounded-lg border border-[#1AAA89]/30 bg-[#162820] px-3 py-2 text-sm text-slate-100 outline-none focus:border-[#1AAA89] font-mono tracking-widest"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -55,7 +55,7 @@ export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
             step={0.01}
             value={shares}
             onChange={(e) => setShares(parseFloat(e.target.value) || 0)}
-            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-[#1AAA89]"
+            className="rounded-lg border border-[#1AAA89]/30 bg-[#162820] px-3 py-2 text-sm text-slate-100 outline-none focus:border-[#1AAA89]"
           />
         </div>
       </div>
