@@ -1,8 +1,12 @@
+import os
 from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 from backend.database import init_db, seed_portfolio
 from backend.routers.health import router as health_router
