@@ -226,7 +226,7 @@ export function App() {
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Holdings</span>
               </div>
-              <div className="p-3 max-h-[320px] overflow-y-auto">
+              <div className="p-3 max-h-[320px] overflow-y-auto scrollbar-hide">
                 <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
               </div>
             </div>
@@ -265,7 +265,7 @@ export function App() {
               <div className="px-4 py-2.5 bg-[#1AAA89]/10 border-b border-[#1AAA89]/20">
                 <span className="text-xs font-semibold text-[#6EC5A2] uppercase tracking-widest">Trade History</span>
               </div>
-              <div className="p-3 max-h-[320px] overflow-y-auto">
+              <div className="p-3 max-h-[320px] overflow-y-auto scrollbar-hide">
                 <TradeHistoryLog trades={trades} loading={portfolioLoading} />
               </div>
             </div>
