@@ -1,9 +1,15 @@
+import { useEffect } from 'react'
+
 interface ErrorBannerProps {
   message: string
   onDismiss: () => void
 }
 
 export function ErrorBanner({ message, onDismiss }: ErrorBannerProps) {
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 5000)
+    return () => clearTimeout(timer)
+  }, [onDismiss])
   return (
     <div
       data-testid="error-banner"
