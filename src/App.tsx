@@ -110,6 +110,13 @@ export function App() {
 
     try {
       const res = await fetch(`http://localhost:8000/market-data/${symbol}/bars`)
+      if (!res.ok) {
+        const err = await res.json() as { detail: string }
+        setLoading(false)
+        setTicker('')
+        setErrorMessage(err.detail ?? `Could not load data for ${symbol}.`)
+        return
+      }
       const data = await res.json() as { ticker: string; bars: Bar[] }
       setBars(data.bars)
       setStreamUrl(`http://localhost:8000/market-data/${symbol}/stream`)
