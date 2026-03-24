@@ -49,12 +49,15 @@ class MarketDataAgent:
         }
 
     async def stream_bars(self, ticker: str) -> AsyncGenerator[dict, None]:
-        queue: list[dict] = []
+        import asyncio
+        import threading
+
+        buffer: list[dict] = []
 
         async def on_bar(bar: object) -> None:
             import alpaca.data.models as models
             if isinstance(bar, models.Bar):
-                queue.append(
+                buffer.append(
                     {
                         "time": int(bar.timestamp.timestamp()),
                         "open": float(bar.open),
@@ -67,16 +70,16 @@ class MarketDataAgent:
         stream = StockDataStream(self._api_key, self._secret_key)
         stream.subscribe_bars(on_bar, ticker)
 
-        import asyncio
-        stream_task = asyncio.create_task(stream.run())
+        thread = threading.Thread(target=stream.run, daemon=True)
+        thread.start()
         try:
             while True:
-                if queue:
-                    yield queue.pop(0)
+                if buffer:
+                    yield buffer.pop(0)
                 else:
                     await asyncio.sleep(0.5)
         finally:
-            stream_task.cancel()
+            stream.stop()
 
     @staticmethod
     def _parse_timeframe(timeframe: str) -> TimeFrame:
