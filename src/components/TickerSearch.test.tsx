@@ -40,4 +40,12 @@ describe('TickerSearch', () => {
     await userEvent.click(screen.getByRole('button', { name: /analyze/i }))
     expect(onAnalyze).not.toHaveBeenCalled()
   })
+
+  it('trims whitespace before calling onAnalyze', async () => {
+    const onAnalyze = vi.fn()
+    render(<TickerSearch onAnalyze={onAnalyze} loading={false} />)
+    await userEvent.type(screen.getByRole('textbox'), 'AAPL ')
+    await userEvent.click(screen.getByRole('button', { name: /analyze/i }))
+    expect(onAnalyze).toHaveBeenCalledWith('AAPL')
+  })
 })
