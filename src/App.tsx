@@ -183,8 +183,9 @@ export function App() {
   }))
 
   return (
-    <div className="min-h-screen flex flex-col items-center gap-8 p-4 sm:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-2 w-full max-w-4xl">
+    <div className="min-h-screen flex flex-col gap-4 p-4 sm:p-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold tracking-tight text-slate-100">Finance Agent</h1>
         <span className={`text-xs font-semibold tracking-widest border px-3 py-1 rounded-full ${classes}`}>
           {label}
@@ -192,54 +193,58 @@ export function App() {
       </div>
 
       {errorMessage && (
-        <div className="w-full max-w-4xl">
-          <ErrorBanner message={errorMessage} onDismiss={() => setErrorMessage(null)} />
-        </div>
+        <ErrorBanner message={errorMessage} onDismiss={() => setErrorMessage(null)} />
       )}
 
-      <div className="w-full max-w-4xl">
-        <PortfolioBar
-          cashBalance={portfolio?.cash_balance ?? 0}
-          totalValue={portfolio?.total_value ?? 0}
-          totalUnrealizedPnl={portfolio?.total_unrealized_pnl ?? 0}
-          loading={portfolioLoading}
-        />
-      </div>
+      {/* Two-column body */}
+      <div className="flex flex-col lg:flex-row gap-6 flex-1">
 
-      <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
-
-      <div className="w-full max-w-4xl">
-        <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
-      </div>
-
-      {ticker && (
-        <div className="w-full max-w-4xl flex flex-col gap-6">
-          {Object.keys(agentProgress).length > 0 && (
-            <AgentProgressTracker agents={agentProgress} />
-          )}
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
-            <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
+        {/* Left pane — wallet + positions + history */}
+        <div className="w-full lg:w-72 shrink-0 flex flex-col gap-4">
+          <PortfolioBar
+            cashBalance={portfolio?.cash_balance ?? 0}
+            totalValue={portfolio?.total_value ?? 0}
+            totalUnrealizedPnl={portfolio?.total_unrealized_pnl ?? 0}
+            loading={portfolioLoading}
+          />
+          <div className="overflow-x-auto">
+            <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
           </div>
+          <TradeHistoryLog trades={trades} loading={portfolioLoading} />
+        </div>
 
-          <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
+        {/* Right pane — search, chart, analysis, trading */}
+        <div className="flex-1 flex flex-col gap-6 min-w-0">
+          <TickerSearch onAnalyze={handleAnalyze} loading={loading} />
 
-          {reportFilename && (
-            <a
-              href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
-              download={reportFilename}
-              className="self-start rounded-lg border border-slate-600 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
-            >
-              Download Report ({reportFilename})
-            </a>
+          <PriceChart bars={bars} ticker={ticker || null} streamUrl={streamUrl} />
+
+          {ticker && (
+            <div className="flex flex-col gap-6">
+              {Object.keys(agentProgress).length > 0 && (
+                <AgentProgressTracker agents={agentProgress} />
+              )}
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
+                <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
+              </div>
+
+              <TradePanel ticker={ticker} onTradeExecuted={fetchPortfolio} />
+
+              {reportFilename && (
+                <a
+                  href={`http://localhost:8000/orchestrate/reports/${reportFilename}`}
+                  download={reportFilename}
+                  className="self-start rounded-lg border border-slate-600 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
+                >
+                  Download Report ({reportFilename})
+                </a>
+              )}
+            </div>
           )}
         </div>
-      )}
 
-      <div className="w-full max-w-4xl flex flex-col gap-4">
-        <PositionsTable positions={mappedPositions} loading={portfolioLoading} />
-        <TradeHistoryLog trades={trades} loading={portfolioLoading} />
       </div>
     </div>
   )
