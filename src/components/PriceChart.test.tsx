@@ -1,18 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi, beforeAll } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { PriceChart } from './PriceChart'
-
-// lightweight-charts requires a real DOM canvas — mock it for jsdom
-beforeAll(() => {
-  HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-    clearRect: vi.fn(), fillRect: vi.fn(), beginPath: vi.fn(),
-    stroke: vi.fn(), fill: vi.fn(), measureText: vi.fn(() => ({ width: 0 })),
-    scale: vi.fn(), translate: vi.fn(), save: vi.fn(), restore: vi.fn(),
-    lineTo: vi.fn(), moveTo: vi.fn(), arc: vi.fn(), rect: vi.fn(),
-    setTransform: vi.fn(), createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
-    createPattern: vi.fn(), clip: vi.fn(),
-  })) as unknown as typeof HTMLCanvasElement.prototype.getContext
-})
 
 const MOCK_BARS = [
   { time: 1700000000 as number, open: 213.0, high: 214.5, low: 212.0, close: 213.5, volume: 1234567 },

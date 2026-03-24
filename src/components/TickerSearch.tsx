@@ -17,6 +17,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
   const [showDropdown, setShowDropdown] = useState(false)
   const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null)
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [isFocused, setIsFocused] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
@@ -71,7 +72,8 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
         const res = await fetch(`http://localhost:8000/assets/search?q=${encodeURIComponent(upper)}`)
         const data = await res.json() as Suggestion[]
         setSuggestions(data)
-        setShowDropdown(data.length > 0)
+        // Only open dropdown if the input still has focus
+        setShowDropdown(data.length > 0 && document.activeElement === inputRef.current)
       } catch {
         setSuggestions([])
         setShowDropdown(false)
@@ -80,6 +82,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
   }
 
   function handleSelect(symbol: string) {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
     setTicker(symbol)
     setSuggestions([])
     setShowDropdown(false)
@@ -88,6 +91,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
   }
 
   function handleSubmit() {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
     const trimmed = ticker.trim()
     if (!trimmed) return
     setSuggestions([])
@@ -121,7 +125,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
     }
   }
 
-  const dropdown = showDropdown && dropdownRect
+  const dropdown = showDropdown && isFocused && dropdownRect
     ? createPortal(
         <ul
           ref={listRef}
@@ -164,7 +168,8 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
           value={ticker}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={() => { setShowDropdown(false); setActiveIndex(-1) }}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => { setIsFocused(false); setShowDropdown(false); setActiveIndex(-1) }}
           placeholder="AAPL"
           className="w-full bg-[#0d1f1a] border border-[#1AAA89]/30 rounded-lg px-4 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-[#1AAA89] uppercase tracking-widest font-mono"
         />
