@@ -38,16 +38,16 @@ describe('PositionsTable', () => {
     expect(screen.getByText('TSLA')).toBeInTheDocument()
   })
 
-  it('shows positive P&L in green', () => {
+  it('shows positive P&L in a positive color', () => {
     render(<PositionsTable positions={[POSITIONS[0]]} loading={false} />)
     const pnl = screen.getByTestId('pnl-AAPL')
-    expect(pnl.className).toMatch(/green/)
+    expect(pnl.className).toMatch(/6EC5A2/)
   })
 
-  it('shows negative P&L in red', () => {
+  it('shows negative P&L in a negative color', () => {
     render(<PositionsTable positions={[POSITIONS[1]]} loading={false} />)
     const pnl = screen.getByTestId('pnl-TSLA')
-    expect(pnl.className).toMatch(/red/)
+    expect(pnl.className).toMatch(/F4532B/)
   })
 
   it('shows empty state when positions is empty', () => {

@@ -14,8 +14,8 @@ interface TradeHistoryLogProps {
 }
 
 const ACTION_STYLES: Record<Trade['action'], string> = {
-  BUY:  'bg-green-400/15 text-green-400',
-  SELL: 'bg-red-400/15 text-red-400',
+  BUY:  'bg-[#1AAA89]/20 text-[#1AAA89]',
+  SELL: 'bg-[#F4532B]/20 text-[#F4532B]',
 }
 
 function fmt(value: number): string {

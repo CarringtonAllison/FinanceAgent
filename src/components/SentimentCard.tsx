@@ -11,9 +11,9 @@ interface SentimentCardProps {
 }
 
 const SCORE_STYLES: Record<SentimentResult['score'], string> = {
-  bullish: 'bg-green-400/15 text-green-400',
-  neutral: 'bg-yellow-400/15 text-yellow-400',
-  bearish: 'bg-red-400/15 text-red-400',
+  bullish: 'bg-[#6EC5A2]/20 text-[#6EC5A2]',
+  neutral: 'bg-[#F7E460]/20 text-[#F7E460]',
+  bearish: 'bg-[#F4532B]/20 text-[#F4532B]',
 }
 
 export function SentimentCard({ sentiment, loading }: SentimentCardProps) {

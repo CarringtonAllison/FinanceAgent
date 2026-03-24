@@ -10,15 +10,15 @@ interface RecommendationCardProps {
 }
 
 const ACTION_STYLES: Record<RecommendationResult['action'], string> = {
-  BUY:  'text-green-400',
-  SELL: 'text-red-400',
-  HOLD: 'text-yellow-400',
+  BUY:  'text-[#6EC5A2]',
+  SELL: 'text-[#F4532B]',
+  HOLD: 'text-[#F7E460]',
 }
 
 const BAR_STYLES: Record<RecommendationResult['action'], string> = {
-  BUY:  'bg-green-500',
-  SELL: 'bg-red-500',
-  HOLD: 'bg-yellow-500',
+  BUY:  'bg-[#6EC5A2]',
+  SELL: 'bg-[#F4532B]',
+  HOLD: 'bg-[#F7E460]',
 }
 
 export function RecommendationCard({ recommendation, loading }: RecommendationCardProps) {

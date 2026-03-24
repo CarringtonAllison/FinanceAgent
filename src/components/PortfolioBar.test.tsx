@@ -13,16 +13,16 @@ describe('PortfolioBar', () => {
     expect(screen.getByText(/\$1,100\.00/)).toBeInTheDocument()
   })
 
-  it('renders positive P&L in green', () => {
+  it('renders positive P&L in a positive color', () => {
     render(<PortfolioBar cashBalance={500} totalValue={1100} totalUnrealizedPnl={100} loading={false} />)
     const pnl = screen.getByTestId('pnl')
-    expect(pnl.className).toMatch(/green/)
+    expect(pnl.className).toMatch(/6EC5A2/)
   })
 
-  it('renders negative P&L in red', () => {
+  it('renders negative P&L in a negative color', () => {
     render(<PortfolioBar cashBalance={500} totalValue={900} totalUnrealizedPnl={-100} loading={false} />)
     const pnl = screen.getByTestId('pnl')
-    expect(pnl.className).toMatch(/red/)
+    expect(pnl.className).toMatch(/F4532B/)
   })
 
   it('renders zero P&L in slate', () => {

@@ -18,8 +18,8 @@ function fmt(value: number): string {
 }
 
 function pnlColor(pnl: number): string {
-  if (pnl > 0) return 'text-green-400'
-  if (pnl < 0) return 'text-red-400'
+  if (pnl > 0) return 'text-[#6EC5A2]'
+  if (pnl < 0) return 'text-[#F4532B]'
   return 'text-slate-500'
 }
 

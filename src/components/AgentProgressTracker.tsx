@@ -29,16 +29,16 @@ const ICON: Record<AgentStatus, string> = {
 
 const NODE_STYLES: Record<AgentStatus, string> = {
   pending:  'border-slate-600 text-slate-500 bg-slate-800/50',
-  running:  'border-yellow-400 text-yellow-400 bg-yellow-400/10 animate-pulse',
-  complete: 'border-green-400 text-green-400 bg-green-400/10',
-  error:    'border-red-400 text-red-400 bg-red-400/10',
+  running:  'border-[#F7E460] text-[#F7E460] bg-[#F7E460]/10 animate-pulse',
+  complete: 'border-[#6EC5A2] text-[#6EC5A2] bg-[#6EC5A2]/10',
+  error:    'border-[#F4532B] text-[#F4532B] bg-[#F4532B]/10',
 }
 
 const LINE_STYLES: Record<AgentStatus, string> = {
   pending:  'bg-slate-700',
-  running:  'bg-yellow-400/40',
-  complete: 'bg-green-400/50',
-  error:    'bg-red-400/40',
+  running:  'bg-[#F7E460]/40',
+  complete: 'bg-[#6EC5A2]/50',
+  error:    'bg-[#F4532B]/40',
 }
 
 export function AgentProgressTracker({ agents }: AgentProgressTrackerProps) {

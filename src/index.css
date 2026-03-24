@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Brand palette */
+:root {
+  --brand-teal:       #1AAA89;
+  --brand-teal-light: #22C49C;
+  --brand-seafoam:    #6EC5A2;
+  --brand-coral:      #F4532B;
+  --brand-coral-light:#F7704D;
+  --brand-yellow:     #F7E460;
+  --brand-mint:       #B8EDAE;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: #0a0a0f;

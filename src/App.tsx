@@ -187,7 +187,7 @@ export function App() {
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-20">
         <div className="flex items-center gap-3 px-6 py-4">
-          <svg className="w-6 h-6 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-6 h-6 text-[#1AAA89] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
             <polyline points="16 7 22 7 22 13" />
           </svg>
@@ -305,9 +305,9 @@ export function App() {
       {/* Footer — backend status */}
       <footer className="border-t border-slate-800 px-6 py-2 flex items-center gap-2">
         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-          backendStatus === 'connected' ? 'bg-green-400' :
-          backendStatus === 'connecting' ? 'bg-yellow-400 animate-pulse' :
-          'bg-red-400'
+          backendStatus === 'connected' ? 'bg-[#1AAA89]' :
+          backendStatus === 'connecting' ? 'bg-[#F7E460] animate-pulse' :
+          'bg-[#F4532B]'
         }`} />
         <span className="text-xs text-slate-500">{label}</span>
       </footer>
