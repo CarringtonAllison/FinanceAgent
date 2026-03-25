@@ -40,8 +40,12 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
   const [currentPrice, setCurrentPrice] = useState<number | null>(null)
   const [priceUp, setPriceUp] = useState<boolean>(true)
 
+  // Create (or recreate) the chart each time ticker is set — this ensures the
+  // container is in the DOM and has its real width when createChart is called.
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!ticker || !containerRef.current) return
+
+    setCurrentPrice(null)
 
     const chart = createChart(containerRef.current, {
       layout: {
@@ -78,7 +82,7 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
       chartRef.current = null
       seriesRef.current = null
     }
-  }, [])
+  }, [ticker])
 
   // Update series data when bars change, then zoom into current time over 2s
   useEffect(() => {
@@ -155,40 +159,36 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
     }
   }, [streamUrl])
 
+  if (!ticker) {
+    return (
+      <div
+        data-testid="price-chart-placeholder"
+        className="flex h-[320px] w-full items-center justify-center rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a]"
+      >
+        <p className="text-sm text-slate-500">Enter a ticker symbol to view the chart.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full bg-[#0d1f1a] border border-[#1AAA89]/25 rounded-xl p-4">
-      {!ticker ? (
-        <div
-          data-testid="price-chart-placeholder"
-          className="flex h-[320px] items-center justify-center"
-        >
-          <p className="text-sm text-slate-500">Enter a ticker symbol to view the chart.</p>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-100 font-bold text-lg font-mono">{ticker}</span>
+          <span className="text-xs text-slate-500">1 Min</span>
         </div>
-      ) : (
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-slate-100 font-bold text-lg font-mono">{ticker}</span>
-            <span className="text-xs text-slate-500">1 Min</span>
+        {currentPrice !== null && (
+          <div className="flex items-center gap-1.5">
+            <span className={`text-xl font-bold font-mono tabular-nums transition-colors duration-300 ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
+              ${fmt(currentPrice)}
+            </span>
+            <span className={`text-xs ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
+              {priceUp ? '▲' : '▼'}
+            </span>
           </div>
-          {currentPrice !== null && (
-            <div className="flex items-center gap-1.5">
-              <span className={`text-xl font-bold font-mono tabular-nums transition-colors duration-300 ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
-                ${fmt(currentPrice)}
-              </span>
-              <span className={`text-xs ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
-                {priceUp ? '▲' : '▼'}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-      {/* Always keep container in DOM so chart initialises on mount regardless of ticker */}
-      <div
-        ref={containerRef}
-        data-testid="price-chart"
-        className="w-full"
-        style={{ display: ticker ? 'block' : 'none' }}
-      />
+        )}
+      </div>
+      <div ref={containerRef} data-testid="price-chart" className="w-full" />
     </div>
   )
 }
