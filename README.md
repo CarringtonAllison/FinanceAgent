@@ -1,6 +1,6 @@
 # Finance Agent
 
-A paper trading simulator powered by a multi-agent AI system. Enter a ticker symbol and the system dispatches four specialized agents in sequence — each passing its output to the next — before surfacing a Claude-generated BUY/SELL/HOLD recommendation.
+A paper trading simulator powered by a multi-agent AI system. Enter a ticker symbol and the system dispatches four specialized agents in sequence — each passing its output to the next — before surfacing a detailed Claude-generated analysis with a BUY/SELL/HOLD recommendation, price targets, risk assessment, and actionable entry/exit levels.
 
 ## How the Multi-Agent System Works
 
@@ -11,9 +11,12 @@ GET /orchestrate/{ticker}/run  →  SSE stream
 │
 ├─ MarketDataAgent        fetch 100 1-min bars + live snapshot via Alpaca REST
 ├─ TechnicalAnalysisAgent compute RSI, MACD, EMA crossover, Bollinger Bands, trend
-├─ SentimentAgent         fetch 10 news headlines via NewsAPI → Claude Haiku scores them
-└─ RecommendationAgent    merge all signals → Claude Sonnet issues BUY/SELL/HOLD
-                                            → write JSON report to backend/reports/
+├─ SentimentAgent         fetch 10 news articles via NewsAPI → Claude Sonnet scores sentiment,
+│                         identifies key themes, returns articles with clickable URLs
+└─ RecommendationAgent    merge all signals → Claude Sonnet issues full analysis:
+                          action, confidence, reasoning, key factors, risk level,
+                          time horizon, entry/stop-loss/target prices
+                          → write JSON report to backend/reports/
 ```
 
 Every agent yields a `running` event before it starts and a `complete` event with its result when done. The frontend consumes this SSE stream and updates each agent's status card in real time.
@@ -23,11 +26,11 @@ Every agent yields a `running` event before it starts and a `complete` event wit
 | Agent | Model | Input | Output |
 |---|---|---|---|
 | `MarketDataAgent` | — | Alpaca REST | OHLCV bars, live price/volume snapshot |
-| `TechnicalAnalysisAgent` | — | bars | RSI, MACD trend, EMA crossover, Bollinger bands, overall trend |
-| `SentimentAgent` | Claude Haiku | headlines | `bullish` / `neutral` / `bearish`, confidence, reasoning |
-| `RecommendationAgent` | Claude Sonnet | snapshot + signals + sentiment | `BUY` / `SELL` / `HOLD`, confidence, reasoning |
+| `TechnicalAnalysisAgent` | — | bars | RSI, MACD (value/signal/histogram/trend), EMA crossover, Bollinger bands, overall trend |
+| `SentimentAgent` | Claude Sonnet | news articles | `bullish` / `neutral` / `bearish`, confidence, 2-3 sentence reasoning, key themes, article links |
+| `RecommendationAgent` | Claude Sonnet | snapshot + signals + sentiment | `BUY` / `SELL` / `HOLD`, confidence, reasoning, key factors, risk level, time horizon, entry/stop-loss/target prices |
 
-**Exactly 2 Claude API calls per full analysis run** — one for sentiment scoring (Haiku, fast + cheap), one for the final recommendation (Sonnet, better reasoning).
+**Exactly 2 Claude API calls per full analysis run** — both using Sonnet for the highest-quality analysis at every step.
 
 ### SSE Event Format
 
@@ -37,9 +40,9 @@ Every agent yields a `running` event before it starts and a `complete` event wit
 {"agent": "technical_analysis", "status": "running",  "result": null}
 {"agent": "technical_analysis", "status": "complete", "result": {"rsi": 58.2, ...}}
 {"agent": "sentiment",          "status": "running",  "result": null}
-{"agent": "sentiment",          "status": "complete", "result": {"score": "bullish", ...}}
+{"agent": "sentiment",          "status": "complete", "result": {"score": "bullish", "confidence": 0.85, "key_themes": [...], "headlines": [{"title": "...", "url": "..."}], ...}}
 {"agent": "recommendation",     "status": "running",  "result": null}
-{"agent": "recommendation",     "status": "complete", "result": {"action": "BUY", ...}}
+{"agent": "recommendation",     "status": "complete", "result": {"action": "BUY", "confidence": 0.81, "key_factors": [...], "risk_level": "medium", "time_horizon": "short", "entry_price": 213.50, "stop_loss": 210.00, "target_price": 220.00, ...}}
 {"agent": "done",               "status": "complete", "result": {...}, "report": "AAPL_20260324_103000.json"}
 ```
 
@@ -48,7 +51,7 @@ Every agent yields a `running` event before it starts and a `complete` event wit
 **Frontend** — React 19, TypeScript, Vite, Tailwind CSS v4
 **Backend** — Python 3.14, FastAPI, SQLAlchemy, SQLite
 **Data** — Alpaca Markets API (REST + WebSocket streaming)
-**AI** — Anthropic Claude API (`claude-haiku-4-5-20251001` + `claude-sonnet-4-6`)
+**AI** — Anthropic Claude API (`claude-sonnet-4-6` for both sentiment and recommendation)
 **News** — NewsAPI
 
 ## Prerequisites
@@ -143,8 +146,8 @@ financeAgent/
     ├── components/
     │   ├── AgentProgressTracker  # Live per-agent status cards
     │   ├── PriceChart            # Candlestick chart + live stream
-    │   ├── SentimentCard         # Score + headlines + reasoning
-    │   ├── RecommendationCard    # Action + confidence + reasoning
+    │   ├── SentimentCard         # Score + key themes + linked article headlines + reasoning
+    │   ├── RecommendationCard    # Action + confidence + key factors + risk/horizon + price levels
     │   ├── TradePanel            # BUY/SELL form
     │   ├── PortfolioBar          # Cash + total value + P&L
     │   ├── PositionsTable        # Open positions
