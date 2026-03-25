@@ -11,34 +11,56 @@ class SentimentAgent:
         anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
 
         if not news_api_key or not anthropic_api_key:
-            return {"score": "neutral", "confidence": 0.0, "headlines": [], "reasoning": "API keys not configured."}
+            return {
+                "score": "neutral",
+                "confidence": 0.0,
+                "headlines": [],
+                "key_themes": [],
+                "reasoning": "API keys not configured.",
+            }
 
-        headlines = self._fetch_headlines(ticker, news_api_key)
+        articles = self._fetch_articles(ticker, news_api_key)
 
-        if not headlines:
-            return {"score": "neutral", "confidence": 0.0, "headlines": [], "reasoning": "No recent news found."}
+        if not articles:
+            return {
+                "score": "neutral",
+                "confidence": 0.0,
+                "headlines": [],
+                "key_themes": [],
+                "reasoning": "No recent news found.",
+            }
 
-        return self._score_with_claude(headlines, anthropic_api_key)
+        return self._score_with_claude(articles, anthropic_api_key)
 
-    def _fetch_headlines(self, ticker: str, api_key: str) -> list[str]:
+    def _fetch_articles(self, ticker: str, api_key: str) -> list[dict]:
         client = NewsApiClient(api_key=api_key)
         response = client.get_everything(q=ticker, language="en", sort_by="publishedAt", page_size=10)
         articles = response.get("articles", [])
-        return [a["title"] for a in articles if a.get("title")][:10]
+        return [
+            {"title": a["title"], "url": a.get("url", "")}
+            for a in articles
+            if a.get("title")
+        ][:10]
 
-    def _score_with_claude(self, headlines: list[str], api_key: str) -> dict:
+    def _score_with_claude(self, articles: list[dict], api_key: str) -> dict:
         client = anthropic.Anthropic(api_key=api_key)
-        headlines_text = "\n".join(f"- {h}" for h in headlines)
+        headlines_text = "\n".join(f"- {a['title']}" for a in articles)
 
         message = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=256,
+            model="claude-sonnet-4-6",
+            max_tokens=512,
             system=(
-                "You are a financial sentiment analyst. "
-                "Given a list of stock news headlines, respond ONLY with valid JSON in this exact format: "
-                '{"score": "bullish" | "neutral" | "bearish", "confidence": <float 0.0-1.0>, "reasoning": "<one sentence>"}'
+                "You are a financial sentiment analyst specializing in equities. "
+                "Given stock news headlines, perform a thorough sentiment analysis. "
+                "Identify the dominant market themes, assess how they affect the stock's near-term outlook, "
+                "and determine the overall sentiment. "
+                "Respond ONLY with valid JSON in this exact format: "
+                '{"score": "bullish" | "neutral" | "bearish", '
+                '"confidence": <float 0.0-1.0>, '
+                '"reasoning": "<2-3 sentence analysis of what the news means for the stock and its near-term price action>", '
+                '"key_themes": ["<theme 1>", "<theme 2>", ...]}'
             ),
-            messages=[{"role": "user", "content": f"Headlines:\n{headlines_text}"}],
+            messages=[{"role": "user", "content": f"Headlines for analysis:\n{headlines_text}"}],
         )
 
         raw = message.content[0].text.strip()
@@ -52,11 +74,18 @@ class SentimentAgent:
         try:
             parsed: dict = json.loads(raw)
         except json.JSONDecodeError:
-            return {"score": "neutral", "confidence": 0.0, "headlines": headlines, "reasoning": "Could not parse sentiment response."}
+            return {
+                "score": "neutral",
+                "confidence": 0.0,
+                "headlines": articles,
+                "key_themes": [],
+                "reasoning": "Could not parse sentiment response.",
+            }
 
         return {
             "score": parsed.get("score", "neutral"),
             "confidence": float(parsed.get("confidence", 0.0)),
-            "headlines": headlines,
+            "headlines": articles,
+            "key_themes": parsed.get("key_themes", []),
             "reasoning": parsed.get("reasoning", ""),
         }

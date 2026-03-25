@@ -1,7 +1,13 @@
+export interface SentimentHeadline {
+  title: string
+  url: string
+}
+
 export interface SentimentResult {
   score: 'bullish' | 'neutral' | 'bearish'
   confidence: number
-  headlines: string[]
+  headlines: SentimentHeadline[]
+  key_themes: string[]
   reasoning: string
 }
 
@@ -38,18 +44,38 @@ export function SentimentCard({ sentiment, loading }: SentimentCardProps) {
         </div>
       </div>
 
-      {visibleHeadlines.length > 0 && (
-        <ul className="flex flex-col gap-1">
-          {visibleHeadlines.map((headline, i) => (
-            <li key={i} className="flex items-center gap-1 text-xs text-slate-500 truncate">
-              <span aria-hidden="true">·</span>
-              <span>{headline}</span>
-            </li>
+      <p className="text-sm text-slate-300">{sentiment.reasoning}</p>
+
+      {sentiment.key_themes.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {sentiment.key_themes.map((theme, i) => (
+            <span key={i} className="rounded-full bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
+              {theme}
+            </span>
           ))}
-        </ul>
+        </div>
       )}
 
-      <p className="text-sm text-slate-300">{sentiment.reasoning}</p>
+      {visibleHeadlines.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Sources</p>
+          <ul className="flex flex-col gap-1">
+            {visibleHeadlines.map((headline, i) => (
+              <li key={i} className="flex items-start gap-1 text-xs">
+                <span aria-hidden="true" className="mt-0.5 shrink-0 text-slate-600">·</span>
+                <a
+                  href={headline.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-slate-200 underline underline-offset-2 transition-colors line-clamp-2"
+                >
+                  {headline.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
