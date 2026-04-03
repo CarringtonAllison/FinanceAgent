@@ -111,3 +111,11 @@ def test_analyze_raises_without_api_key(agent: RecommendationAgent) -> None:
     with patch("backend.agents.recommendation.os.getenv", return_value=None):
         with pytest.raises(RuntimeError, match="ANTHROPIC_API_KEY"):
             agent.analyze("AAPL", MOCK_MARKET_DATA, MOCK_SIGNALS, MOCK_SENTIMENT)
+
+
+def test_analyze_raises_runtime_error_on_anthropic_api_failure(agent: RecommendationAgent) -> None:
+    with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}), \
+         patch("backend.agents.recommendation.anthropic.Anthropic") as MockClaude:
+        MockClaude.return_value.messages.create.side_effect = Exception("Anthropic service unavailable")
+        with pytest.raises(RuntimeError, match="Recommendation"):
+            agent.analyze("AAPL", MOCK_MARKET_DATA, MOCK_SIGNALS, MOCK_SENTIMENT)
