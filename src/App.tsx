@@ -173,6 +173,17 @@ export function App() {
         if (payload.status === 'error') {
           const errResult = payload.result as { error?: string } | null
           setErrorMessage(errResult?.error ?? 'The analysis pipeline encountered an unexpected error.')
+          setSentiment(null)
+          setRecommendation(null)
+          setAgentProgress((prev) => {
+            const updated = { ...prev }
+            for (const key of Object.keys(updated)) {
+              if (updated[key].status === 'running') {
+                updated[key] = { status: 'error', result: null }
+              }
+            }
+            return updated
+          })
         } else if (payload.report) {
           setReportFilename(payload.report as string)
         }
@@ -340,10 +351,18 @@ export function App() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1AAA89]/20">
               <div className="p-5">
-                <SentimentCard sentiment={sentiment} loading={loading && sentiment === null} />
+                <SentimentCard
+                  sentiment={sentiment}
+                  loading={loading && sentiment === null && agentProgress['sentiment']?.status !== 'error'}
+                  failed={agentProgress['sentiment']?.status === 'error'}
+                />
               </div>
               <div className="p-5">
-                <RecommendationCard recommendation={recommendation} loading={loading && recommendation === null} />
+                <RecommendationCard
+                  recommendation={recommendation}
+                  loading={loading && recommendation === null && agentProgress['recommendation']?.status !== 'error'}
+                  failed={agentProgress['recommendation']?.status === 'error'}
+                />
               </div>
             </div>
           </div>
