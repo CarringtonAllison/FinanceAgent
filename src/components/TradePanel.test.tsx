@@ -26,9 +26,9 @@ describe('TradePanel', () => {
     expect(screen.getByRole('button', { name: /sell/i })).toBeInTheDocument()
   })
 
-  it('renders shares number input', () => {
+  it('renders shares input', () => {
     render(<TradePanel ticker="AAPL" onTradeExecuted={vi.fn()} />)
-    expect(screen.getByRole('spinbutton')).toBeInTheDocument()
+    expect(screen.getByLabelText('Shares')).toBeInTheDocument()
   })
 
   it('calls fetch with correct body on BUY submit', async () => {
@@ -39,8 +39,8 @@ describe('TradePanel', () => {
     vi.stubGlobal('fetch', mockFetch)
 
     render(<TradePanel ticker="AAPL" onTradeExecuted={vi.fn()} />)
-    await userEvent.clear(screen.getByRole('spinbutton'))
-    await userEvent.type(screen.getByRole('spinbutton'), '3')
+    await userEvent.clear(screen.getByLabelText('Shares'))
+    await userEvent.type(screen.getByLabelText('Shares'), '3')
     await userEvent.click(screen.getByRole('button', { name: /buy/i }))
 
     await waitFor(() => {
@@ -62,8 +62,8 @@ describe('TradePanel', () => {
     }))
 
     render(<TradePanel ticker="TSLA" onTradeExecuted={onTradeExecuted} />)
-    await userEvent.clear(screen.getByRole('spinbutton'))
-    await userEvent.type(screen.getByRole('spinbutton'), '1')
+    await userEvent.clear(screen.getByLabelText('Shares'))
+    await userEvent.type(screen.getByLabelText('Shares'), '1')
     await userEvent.click(screen.getByRole('button', { name: /buy/i }))
 
     await waitFor(() => expect(onTradeExecuted).toHaveBeenCalled())
@@ -83,8 +83,8 @@ describe('TradePanel', () => {
     }))
 
     render(<TradePanel ticker="AAPL" onTradeExecuted={vi.fn()} />)
-    await userEvent.clear(screen.getByRole('spinbutton'))
-    await userEvent.type(screen.getByRole('spinbutton'), '100')
+    await userEvent.clear(screen.getByLabelText('Shares'))
+    await userEvent.type(screen.getByLabelText('Shares'), '100')
     await userEvent.click(screen.getByRole('button', { name: /buy/i }))
 
     await waitFor(() => expect(screen.getByText(/insufficient cash/i)).toBeInTheDocument())

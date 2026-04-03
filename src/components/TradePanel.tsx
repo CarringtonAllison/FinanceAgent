@@ -37,7 +37,7 @@ export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
           <label className="text-xs text-[#6EC5A2]/70">Ticker</label>
           <input
@@ -48,13 +48,14 @@ export function TradePanel({ ticker, onTradeExecuted }: TradePanelProps) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#6EC5A2]/70">Shares</label>
+          <label htmlFor="shares-input" className="text-xs text-[#6EC5A2]/70">Shares</label>
           <input
-            type="number"
-            min={0.01}
-            step={0.01}
+            id="shares-input"
+            type="text"
+            inputMode="decimal"
             value={shares}
             onChange={(e) => setShares(parseFloat(e.target.value) || 0)}
+            onFocus={(e) => e.target.select()}
             className="rounded-lg border border-[#1AAA89]/30 bg-[#162820] px-3 py-2 text-sm text-slate-100 outline-none focus:border-[#1AAA89]"
           />
         </div>
