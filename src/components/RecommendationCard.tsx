@@ -13,6 +13,7 @@ export interface RecommendationResult {
 interface RecommendationCardProps {
   recommendation: RecommendationResult | null
   loading: boolean
+  failed?: boolean
 }
 
 const ACTION_STYLES: Record<RecommendationResult['action'], string> = {
@@ -49,12 +50,24 @@ function PriceRow({ label, value }: { label: string; value: number | null }) {
   )
 }
 
-export function RecommendationCard({ recommendation, loading }: RecommendationCardProps) {
+export function RecommendationCard({ recommendation, loading, failed }: RecommendationCardProps) {
   if (loading) {
     return <p className="text-sm text-slate-500 animate-pulse">Generating recommendation…</p>
   }
 
-  if (!recommendation) return <div></div>
+  if (!recommendation) {
+    if (failed) {
+      return (
+        <div className="flex flex-col gap-2">
+          <h3 className="font-semibold text-slate-100">Recommendation</h3>
+          <p className="text-sm text-[#F7E460]">
+            A recommendation could not be generated for this run. Try again or check that your API keys are configured.
+          </p>
+        </div>
+      )
+    }
+    return <div></div>
+  }
 
   const confidencePct = Math.round(recommendation.confidence * 100)
   const hasPriceLevels =

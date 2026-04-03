@@ -14,6 +14,7 @@ export interface SentimentResult {
 interface SentimentCardProps {
   sentiment: SentimentResult | null
   loading: boolean
+  failed?: boolean
 }
 
 const SCORE_STYLES: Record<SentimentResult['score'], string> = {
@@ -22,12 +23,24 @@ const SCORE_STYLES: Record<SentimentResult['score'], string> = {
   bearish: 'bg-[#F4532B]/20 text-[#F4532B]',
 }
 
-export function SentimentCard({ sentiment, loading }: SentimentCardProps) {
+export function SentimentCard({ sentiment, loading, failed }: SentimentCardProps) {
   if (loading) {
     return <p className="text-sm text-slate-500 animate-pulse">Analyzing sentiment…</p>
   }
 
-  if (!sentiment) return <div></div>
+  if (!sentiment) {
+    if (failed) {
+      return (
+        <div className="flex flex-col gap-2">
+          <h3 className="font-semibold text-slate-100">Sentiment</h3>
+          <p className="text-sm text-[#F7E460]">
+            Sentiment analysis could not be completed for this run. The recommendation below may be based on limited information.
+          </p>
+        </div>
+      )
+    }
+    return <div></div>
+  }
 
   const visibleHeadlines = sentiment.headlines.slice(0, 5)
   const confidencePct = Math.round(sentiment.confidence * 100)
