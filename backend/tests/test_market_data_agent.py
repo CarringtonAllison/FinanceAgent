@@ -60,6 +60,34 @@ def test_get_snapshot_returns_correct_keys(agent: MarketDataAgent) -> None:
     assert {"ticker", "price", "volume"}.issubset(snapshot.keys())
 
 
+def test_get_bars_raises_runtime_error_on_api_exception(agent: MarketDataAgent) -> None:
+    agent._client.get_stock_bars.side_effect = Exception("Connection refused")
+    with pytest.raises(RuntimeError, match="AAPL"):
+        agent.get_bars("AAPL")
+
+
+def test_get_bars_raises_runtime_error_on_invalid_ticker(agent: MarketDataAgent) -> None:
+    mock_response = MagicMock()
+    mock_response.__getitem__ = MagicMock(side_effect=KeyError("FAKE"))
+    agent._client.get_stock_bars.return_value = mock_response
+    with pytest.raises(RuntimeError, match="not found"):
+        agent.get_bars("FAKE")
+
+
+def test_get_snapshot_raises_runtime_error_on_api_exception(agent: MarketDataAgent) -> None:
+    agent._client.get_stock_snapshot.side_effect = Exception("Timeout")
+    with pytest.raises(RuntimeError, match="AAPL"):
+        agent.get_snapshot("AAPL")
+
+
+def test_get_snapshot_raises_runtime_error_on_invalid_ticker(agent: MarketDataAgent) -> None:
+    mock_response = MagicMock()
+    mock_response.__getitem__ = MagicMock(side_effect=KeyError("FAKE"))
+    agent._client.get_stock_snapshot.return_value = mock_response
+    with pytest.raises(RuntimeError, match="not found"):
+        agent.get_snapshot("FAKE")
+
+
 def test_get_snapshot_returns_correct_ticker(agent: MarketDataAgent) -> None:
     mock_snapshot = MagicMock()
     mock_snapshot.latest_trade.price = 213.50
