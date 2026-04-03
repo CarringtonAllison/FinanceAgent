@@ -7,6 +7,8 @@ from alpaca.data.requests import StockBarsRequest, StockSnapshotRequest
 from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
 from dotenv import load_dotenv
 
+from backend.agents.retry import retry_sync
+
 load_dotenv()
 
 
@@ -24,8 +26,15 @@ class MarketDataAgent:
     ) -> list[dict]:
         tf = self._parse_timeframe(timeframe)
         request = StockBarsRequest(symbol_or_symbols=ticker, timeframe=tf, limit=limit)
-        response = self._client.get_stock_bars(request)
-        bars = response[ticker]
+        try:
+            response = retry_sync(lambda: self._client.get_stock_bars(request))
+            bars = response[ticker]
+        except KeyError:
+            raise RuntimeError(f"Ticker '{ticker}' was not found. Please check the symbol.")
+        except Exception as exc:
+            raise RuntimeError(
+                f"Could not fetch price data for {ticker}. The market data service may be temporarily unavailable."
+            ) from exc
         return [
             {
                 "time": int(bar.timestamp.timestamp()),
@@ -40,8 +49,15 @@ class MarketDataAgent:
 
     def get_snapshot(self, ticker: str) -> dict:
         request = StockSnapshotRequest(symbol_or_symbols=ticker)
-        response = self._client.get_stock_snapshot(request)
-        snap = response[ticker]
+        try:
+            response = retry_sync(lambda: self._client.get_stock_snapshot(request))
+            snap = response[ticker]
+        except KeyError:
+            raise RuntimeError(f"Ticker '{ticker}' was not found. Please check the symbol.")
+        except Exception as exc:
+            raise RuntimeError(
+                f"Could not fetch snapshot for {ticker}. The market data service may be temporarily unavailable."
+            ) from exc
         return {
             "ticker": ticker,
             "price": float(snap.latest_trade.price),
