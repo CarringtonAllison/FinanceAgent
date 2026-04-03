@@ -106,4 +106,15 @@ describe('SentimentCard', () => {
     render(<SentimentCard sentiment={NEUTRAL} loading={false} />)
     expect(screen.getByText(/neutral/i)).toBeInTheDocument()
   })
+
+  it('shows failure message when failed is true and no sentiment', () => {
+    render(<SentimentCard sentiment={null} loading={false} failed={true} />)
+    expect(screen.getByText(/could not be completed/i)).toBeInTheDocument()
+  })
+
+  it('renders normally when failed is true but sentiment is present', () => {
+    render(<SentimentCard sentiment={BULLISH} loading={false} failed={true} />)
+    expect(screen.getByText(/bullish/i)).toBeInTheDocument()
+    expect(screen.queryByText(/could not be completed/i)).not.toBeInTheDocument()
+  })
 })

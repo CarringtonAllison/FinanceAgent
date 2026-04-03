@@ -102,4 +102,15 @@ describe('RecommendationCard', () => {
     render(<RecommendationCard recommendation={HOLD} loading={false} />)
     expect(screen.queryByText('Entry')).not.toBeInTheDocument()
   })
+
+  it('shows failure message when failed is true and no recommendation', () => {
+    render(<RecommendationCard recommendation={null} loading={false} failed={true} />)
+    expect(screen.getByText(/could not be generated/i)).toBeInTheDocument()
+  })
+
+  it('renders normally when failed is true but recommendation is present', () => {
+    render(<RecommendationCard recommendation={BUY} loading={false} failed={true} />)
+    expect(screen.getByText('BUY')).toBeInTheDocument()
+    expect(screen.queryByText(/could not be generated/i)).not.toBeInTheDocument()
+  })
 })
