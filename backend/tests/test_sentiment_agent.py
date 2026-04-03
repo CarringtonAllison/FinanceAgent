@@ -81,3 +81,21 @@ def test_analyze_falls_back_when_no_api_key(agent: SentimentAgent) -> None:
     assert result["score"] == "neutral"
     assert result["headlines"] == []
     assert result["key_themes"] == []
+
+
+def test_analyze_raises_runtime_error_on_news_api_failure(agent: SentimentAgent) -> None:
+    with patch.dict("os.environ", _ENV), \
+         patch("backend.agents.sentiment.NewsApiClient") as MockNews:
+        MockNews.return_value.get_everything.side_effect = Exception("NewsAPI rate limit")
+        with pytest.raises(RuntimeError, match="news"):
+            agent.analyze("AAPL")
+
+
+def test_analyze_raises_runtime_error_on_anthropic_failure(agent: SentimentAgent) -> None:
+    with patch.dict("os.environ", _ENV), \
+         patch("backend.agents.sentiment.NewsApiClient") as MockNews, \
+         patch("backend.agents.sentiment.anthropic.Anthropic") as MockClaude:
+        MockNews.return_value.get_everything.return_value = {"articles": MOCK_ARTICLES}
+        MockClaude.return_value.messages.create.side_effect = Exception("Anthropic API error")
+        with pytest.raises(RuntimeError, match="Sentiment"):
+            agent.analyze("AAPL")
