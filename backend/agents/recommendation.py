@@ -3,6 +3,8 @@ import os
 
 import anthropic
 
+from backend.agents.retry import retry_sync
+
 
 class RecommendationAgent:
     def analyze(
@@ -42,8 +44,9 @@ class RecommendationAgent:
             f"Key themes: {', '.join(sentiment.get('key_themes', []))}\n"
         )
 
-        message = client.messages.create(
-            model="claude-sonnet-4-6",
+        try:
+            message = retry_sync(lambda: client.messages.create(
+                model="claude-sonnet-4-6",
             max_tokens=1024,
             system=(
                 "You are an expert equity analyst and day trading advisor. "
@@ -67,8 +70,10 @@ class RecommendationAgent:
                 '"stop_loss": <float or null>, '
                 '"target_price": <float or null>}'
             ),
-            messages=[{"role": "user", "content": prompt}],
-        )
+                messages=[{"role": "user", "content": prompt}],
+            ))
+        except Exception as exc:
+            raise RuntimeError("Recommendation is unavailable. The AI service returned an error.") from exc
 
         raw = message.content[0].text.strip()
         # Strip markdown code fences if Claude wrapped the JSON
