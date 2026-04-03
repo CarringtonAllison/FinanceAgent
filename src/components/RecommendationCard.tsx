@@ -66,7 +66,7 @@ export function RecommendationCard({ recommendation, loading }: RecommendationCa
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-slate-100">Recommendation</h3>
-        <span className={`text-2xl font-bold ${ACTION_STYLES[recommendation.action]}`}>
+        <span className={`text-xl sm:text-2xl font-bold ${ACTION_STYLES[recommendation.action]}`}>
           {recommendation.action}
         </span>
       </div>

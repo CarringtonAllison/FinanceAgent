@@ -133,8 +133,8 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
           style={{
             position: 'fixed',
             top: dropdownRect.bottom + 4,
-            left: dropdownRect.left,
-            width: dropdownRect.width,
+            left: Math.max(8, dropdownRect.left),
+            width: Math.min(dropdownRect.width, window.innerWidth - 16),
           }}
           className="z-50 rounded-lg border border-[#1AAA89]/30 bg-[#0d1f1a] shadow-xl overflow-hidden"
         >
@@ -160,7 +160,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
     : null
 
   return (
-    <div className="flex gap-3 w-full max-w-md">
+    <div className="flex gap-2 sm:gap-3 w-full sm:max-w-md">
       <div className="relative flex-1">
         <input
           ref={inputRef}
@@ -178,7 +178,7 @@ export function TickerSearch({ onAnalyze, loading }: TickerSearchProps) {
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="bg-[#1AAA89] hover:bg-[#22C49C] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold px-5 py-2 rounded-lg transition-colors"
+        className="bg-[#1AAA89] hover:bg-[#22C49C] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold px-3 sm:px-5 py-2 rounded-lg transition-colors shrink-0"
       >
         {loading ? 'Analyzing...' : 'Analyze'}
       </button>

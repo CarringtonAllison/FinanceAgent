@@ -57,20 +57,20 @@ export function AgentProgressTracker({ agents }: AgentProgressTrackerProps) {
             {/* Step node */}
             <div className="flex flex-col items-center gap-1.5 shrink-0">
               <div
-                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-base font-bold transition-all duration-300 ${NODE_STYLES[state.status]}`}
+                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center text-xs sm:text-base font-bold transition-all duration-300 ${NODE_STYLES[state.status]}`}
               >
                 {/* sr-only preserves status text for accessibility + tests */}
                 <span className="sr-only transition-all duration-300">{state.status}</span>
                 <span aria-hidden="true">{ICON[state.status]}</span>
               </div>
-              <span className="text-xs text-slate-400 text-center leading-tight w-[90px]">
+              <span className="text-[10px] sm:text-xs text-slate-400 text-center leading-tight w-14 sm:w-[90px]">
                 {AGENT_LABELS[name] ?? name}
               </span>
             </div>
 
             {/* Connector line — vertically centered with the icon (mt = half icon height) */}
             {!isLast && (
-              <div className={`flex-1 h-px mt-4 mx-1 transition-all duration-500 ${LINE_STYLES[state.status]}`} />
+              <div className={`flex-1 h-px mt-3 sm:mt-4 mx-0.5 sm:mx-1 transition-all duration-500 ${LINE_STYLES[state.status]}`} />
             )}
           </Fragment>
         )

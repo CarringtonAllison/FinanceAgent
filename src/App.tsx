@@ -221,7 +221,7 @@ export function App() {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="border-b border-[#1AAA89]/30 bg-[#0d1f1a]/80 backdrop-blur-sm sticky top-0 z-20">
-        <div className="flex items-center gap-4 px-6 py-3">
+        <div className="flex items-center gap-4 px-3 sm:px-6 py-3">
           {/* Logo + title */}
           <div className="flex items-center gap-3 shrink-0">
             <svg className="w-6 h-6 text-[#1AAA89] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -234,8 +234,8 @@ export function App() {
             </div>
           </div>
 
-          {/* Rotating quote */}
-          <div className="flex-1 flex justify-center px-4 overflow-hidden">
+          {/* Rotating quote — hidden on small screens */}
+          <div className="flex-1 hidden sm:flex justify-center px-4 overflow-hidden">
             <p
               className="text-xs text-center italic transition-opacity duration-500 max-w-xl"
               style={{ opacity: quoteVisible ? 1 : 0 }}
@@ -352,7 +352,7 @@ export function App() {
       </div>
 
       {/* Footer — backend status + report download */}
-      <footer className="border-t border-[#1AAA89]/20 px-6 py-2 flex items-center gap-4">
+      <footer className="border-t border-[#1AAA89]/20 px-3 sm:px-6 py-2 flex items-center gap-4">
         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
           backendStatus === 'connected' ? 'bg-[#1AAA89]' :
           backendStatus === 'connecting' ? 'bg-[#F7E460] animate-pulse' :

@@ -61,7 +61,7 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
         secondsVisible: false,
       },
       width: containerRef.current.clientWidth,
-      height: 320,
+      height: window.innerWidth < 640 ? 240 : 320,
     })
 
     const series = chart.addSeries(CandlestickSeries, {
@@ -163,7 +163,7 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
     return (
       <div
         data-testid="price-chart-placeholder"
-        className="flex h-[320px] w-full items-center justify-center rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a]"
+        className="flex h-[240px] sm:h-[320px] w-full items-center justify-center rounded-xl border border-[#1AAA89]/25 bg-[#0d1f1a]"
       >
         <p className="text-sm text-slate-500">Enter a ticker symbol to view the chart.</p>
       </div>
@@ -174,12 +174,12 @@ export function PriceChart({ bars, ticker, streamUrl }: PriceChartProps) {
     <div className="w-full bg-[#0d1f1a] border border-[#1AAA89]/25 rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-slate-100 font-bold text-lg font-mono">{ticker}</span>
+          <span className="text-slate-100 font-bold text-base sm:text-lg font-mono">{ticker}</span>
           <span className="text-xs text-slate-500">1 Min</span>
         </div>
         {currentPrice !== null && (
           <div className="flex items-center gap-1.5">
-            <span className={`text-xl font-bold font-mono tabular-nums transition-colors duration-300 ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
+            <span className={`text-lg sm:text-xl font-bold font-mono tabular-nums transition-colors duration-300 ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
               ${fmt(currentPrice)}
             </span>
             <span className={`text-xs ${priceUp ? 'text-[#6EC5A2]' : 'text-[#F4532B]'}`}>
