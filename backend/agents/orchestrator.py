@@ -14,43 +14,56 @@ REPORTS_DIR = os.path.join(os.path.dirname(__file__), "..", "reports")
 class OrchestratorAgent:
     async def run(self, ticker: str) -> AsyncGenerator[dict, None]:
         ticker = ticker.upper()
-        market_data: dict = {}
+        bars: list = []
+        snapshot: dict = {}
         signals: dict = {}
         sentiment: dict = {}
         recommendation: dict = {}
 
-        # --- Market Data ---
+        # --- Market Data — hard stop on failure ---
         yield {"agent": "market_data", "status": "running", "result": None}
         md_agent = MarketDataAgent()
-        bars = md_agent.get_bars(ticker)
-        snapshot = md_agent.get_snapshot(ticker)
-        market_data = {"bars": bars, "snapshot": snapshot}
-        yield {"agent": "market_data", "status": "complete", "result": snapshot}
+        try:
+            bars = md_agent.get_bars(ticker)
+            snapshot = md_agent.get_snapshot(ticker)
+            yield {"agent": "market_data", "status": "complete", "result": snapshot}
+        except Exception as exc:
+            yield {"agent": "market_data", "status": "error", "result": {"error": str(exc)}}
+            yield {"agent": "done", "status": "error", "result": {"error": str(exc)}}
+            return
 
-        # --- Technical Analysis ---
+        # --- Technical Analysis — fail-forward ---
         yield {"agent": "technical_analysis", "status": "running", "result": None}
         ta_agent = TechnicalAnalysisAgent()
         try:
             ta_result = ta_agent.analyze(bars)
             signals = ta_result.get("signals", {})
             yield {"agent": "technical_analysis", "status": "complete", "result": signals}
-        except ValueError as exc:
+        except Exception as exc:
             yield {"agent": "technical_analysis", "status": "error", "result": {"error": str(exc)}}
             signals = {}
 
-        # --- Sentiment ---
+        # --- Sentiment — fail-forward ---
         yield {"agent": "sentiment", "status": "running", "result": None}
         sent_agent = SentimentAgent()
-        sentiment = sent_agent.analyze(ticker)
-        yield {"agent": "sentiment", "status": "complete", "result": sentiment}
+        try:
+            sentiment = sent_agent.analyze(ticker)
+            yield {"agent": "sentiment", "status": "complete", "result": sentiment}
+        except Exception as exc:
+            yield {"agent": "sentiment", "status": "error", "result": {"error": str(exc)}}
+            sentiment = {}
 
-        # --- Recommendation ---
+        # --- Recommendation — fail-forward ---
         yield {"agent": "recommendation", "status": "running", "result": None}
         rec_agent = RecommendationAgent()
-        recommendation = rec_agent.analyze(ticker, snapshot, signals, sentiment)
-        yield {"agent": "recommendation", "status": "complete", "result": recommendation}
+        try:
+            recommendation = rec_agent.analyze(ticker, snapshot, signals, sentiment)
+            yield {"agent": "recommendation", "status": "complete", "result": recommendation}
+        except Exception as exc:
+            yield {"agent": "recommendation", "status": "error", "result": {"error": str(exc)}}
+            recommendation = {}
 
-        # --- Write JSON Report ---
+        # --- Write JSON Report (always runs if market data succeeded) ---
         full_result = {
             "ticker": ticker,
             "timestamp": datetime.now(timezone.utc).isoformat(),
