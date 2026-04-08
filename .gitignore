@@ -15,3 +15,6 @@ __pycache__/
 
 # Generated reports
 backend/reports/*.json
+
+# Video files
+*.mp4

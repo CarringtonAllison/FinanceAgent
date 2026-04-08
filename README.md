@@ -2,6 +2,10 @@
 
 A paper trading simulator powered by a multi-agent AI system. Enter a ticker symbol and the system dispatches four specialized agents in sequence — each passing its output to the next — before surfacing a detailed Claude-generated analysis with a BUY/SELL/HOLD recommendation, price targets, risk assessment, and actionable entry/exit levels.
 
+## Demo
+
+https://github.com/user-attachments/assets/f607e7b3-24a8-4e1b-b747-8640d2a89ee2
+
 ## How the Multi-Agent System Works
 
 The core insight is **specialization + sequencing**: each agent does one thing well, and the orchestrator pipes results forward so every downstream agent has richer context than it could compute alone.
@@ -66,7 +70,7 @@ Every agent yields a `running` event before it starts and a `complete` event wit
 
 **1. Clone and install frontend deps**
 ```bash
-git clone <repo-url>
+git clone https://github.com/CarringtonAllison/FinanceAgent.git
 cd financeAgent
 npm install
 ```
@@ -133,10 +137,11 @@ financeAgent/
 │   ├── agents/
 │   │   ├── market_data.py        # Alpaca REST + WebSocket
 │   │   ├── technical_analysis.py # RSI, MACD, EMA, Bollinger
-│   │   ├── sentiment.py          # NewsAPI + Claude Haiku
+│   │   ├── sentiment.py          # NewsAPI + Claude Sonnet
 │   │   ├── recommendation.py     # Claude Sonnet
 │   │   ├── orchestrator.py       # Sequencing + SSE events
-│   │   └── portfolio.py          # Paper trading logic
+│   │   ├── portfolio.py          # Paper trading logic
+│   │   └── retry.py              # Retry utility for flaky calls
 │   ├── routers/                  # FastAPI route handlers
 │   ├── reports/                  # Generated JSON analysis reports
 │   ├── tests/                    # Pytest test suite
@@ -151,6 +156,7 @@ financeAgent/
     │   ├── TradePanel            # BUY/SELL form
     │   ├── PortfolioBar          # Cash + total value + P&L
     │   ├── PositionsTable        # Open positions
-    │   └── TradeHistoryLog       # Trade history
+    │   ├── TradeHistoryLog       # Trade history
+    │   └── ErrorBanner           # Global error display
     └── App.tsx                   # Root — wires SSE stream to components
 ```
